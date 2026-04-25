@@ -1,0 +1,350 @@
+/**
+ * UI controller — управляет DOM, подписывается на события VM
+ */
+
+const UI = {
+  vm: null,
+
+  init(vm) {
+    this.vm = vm;
+    this._bindNavigation();
+    this._subscribe();
+  },
+
+  // ============================================================
+  // Navigation bindings
+  // ============================================================
+  _bindNavigation() {
+    // Splash → difficulty
+    document.getElementById('btn-start').addEventListener('click', () => {
+      this.vm.navigate('level-select');
+    });
+
+    // Back: difficulty → splash
+    document.getElementById('btn-back-to-splash').addEventListener('click', () => {
+      this.vm.navigate('splash');
+    });
+
+    // Level cards → start session
+    document.querySelectorAll('.level-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const range = card.dataset.range;
+        const dist = card.dataset.distraction;
+        const distLevel = dist === 'easy' ? DistractionLevel.NONE
+                      : dist === 'medium' ? DistractionLevel.DIFFERENT_COLORS
+                      : DistractionLevel.TYPE_FILTER;
+        this.vm.startSession(range, distLevel);
+      });
+    });
+
+    // Digit select: change level → difficulty
+    document.getElementById('btn-change-level').addEventListener('click', () => {
+      this.vm.navigate('level-select');
+    });
+
+    // Digit select: back → difficulty
+    document.getElementById('btn-back-to-levels').addEventListener('click', () => {
+      this.vm.navigate('level-select');
+    });
+
+    // Game: speak button
+    document.getElementById('btn-speak').addEventListener('click', () => {
+      this.vm.repeatAudio();
+    });
+
+    // Reward → next digit
+    document.getElementById('btn-next-digit').addEventListener('click', () => {
+      this.vm.continueFromReward();
+    });
+
+    // Reward → menu
+    document.getElementById('btn-menu').addEventListener('click', () => {
+      this.vm.navigate('level-select');
+    });
+
+    // Completion → restart level
+    document.getElementById('restart-btn').addEventListener('click', () => {
+      this.vm.restartLevel();
+    });
+
+    // Completion → menu
+    document.getElementById('btn-back-to-splash-2').addEventListener('click', () => {
+      this.vm.navigate('level-select');
+    });
+  },
+
+  // ============================================================
+  // VM event subscriptions
+  // ============================================================
+  _subscribe() {
+    const vm = this.vm;
+
+    vm.addEventListener('screenChanged',    () => this._renderScreen());
+    vm.addEventListener('taskChanged',     () => this._renderTask());
+    vm.addEventListener('feedbackChanged', () => this._updateFeedback());
+    vm.addEventListener('correctAnswer',   () => this._onCorrect());
+    vm.addEventListener('wrongAnswer',      () => this._onWrong());
+    vm.addEventListener('hintActivated',   () => this._showHint());
+    vm.addEventListener('hintDeactivated', () => this._hideHint());
+    vm.addEventListener('rewardEarned',     (e) => this._showReward(e.detail));
+    vm.addEventListener('starsUpdated',     () => this._updateStars());
+    vm.addEventListener('audioRequested',  (e) => Speech.speakTask(e.detail));
+  },
+
+  // ============================================================
+  // Screen rendering
+  // ============================================================
+  _renderScreen() {
+    const screen = this.vm.currentScreen;
+
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+    const map = {
+      splash:        'splash',
+      'level-select': 'level-select',
+      'digit-select': 'digit-select',
+      task:          'game',
+      reward:        'reward',
+      completion:    'completion',
+    };
+
+    const el = document.getElementById(map[screen] || screen);
+    if (el) el.classList.add('active');
+
+    if (screen === 'level-select') this._renderLevelSelect();
+    if (screen === 'digit-select')   this._renderDigitSelect();
+    if (screen === 'task')          this._updateStars();
+  },
+
+  _renderLevelSelect() {
+    const total = this.vm.totalStars;
+    const el = document.getElementById('total-stars');
+    if (el) el.textContent = total > 0 ? '⭐'.repeat(Math.min(total, 20)) : '';
+  },
+
+  _renderDigitSelect() {
+    const rangeInfo = this._getRangeInfo();
+    const [min, max] = rangeInfo.range.split('-').map(Number);
+
+    const titleEl = document.getElementById('digit-select-title');
+    if (titleEl) titleEl.textContent = `Учим ${rangeInfo.range}`;
+
+    const grid = document.getElementById('digit-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    for (let d = min; d <= max; d++) {
+      const btn = document.createElement('button');
+      btn.className = 'digit-btn';
+      const stars = this.vm.getStarsForDigit(d);
+      if (stars >= 3) {
+        btn.classList.add('starred');
+        btn.innerHTML = `${d}<span class="digit-stars">⭐⭐⭐</span>`;
+      } else {
+        btn.innerHTML = `${d}<span class="digit-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</span>`;
+      }
+      btn.addEventListener('click', () => {
+        this.vm.currentDigit = d;
+        this.vm.isLessonComplete = false;
+        this.vm._generateLessonTasks();
+        this.vm.navigate('task');
+        this.vm._nextTaskFromQueue();
+      });
+      grid.appendChild(btn);
+    }
+
+    const starsEl = document.getElementById('level-stars');
+    if (starsEl) {
+      starsEl.textContent = this.vm.totalStars > 0
+        ? '⭐'.repeat(Math.min(this.vm.totalStars, 10))
+        : '';
+    }
+  },
+
+  _getRangeInfo() {
+    const d = this.vm.difficulty;
+    return {
+      range: d === 'easy' ? '1-5' : d === 'medium' ? '1-10' : '1-20',
+      dist: d,
+    };
+  },
+
+  // ============================================================
+  // Task rendering
+  // ============================================================
+  _renderTask() {
+    const task = this.vm.currentTaskData;
+    if (!task) return;
+
+    this._renderQuestion(task);
+    this._renderContent(task);
+    this._renderOptions(task);
+    this._updateTaskProgress();
+  },
+
+  _renderQuestion(task) {
+    const q = document.getElementById('question-emoji');
+    if (task.questionEmoji) {
+      q.innerHTML = task.questionEmoji;
+    } else if (task.items.length > 0) {
+      q.textContent = task.items[0].emoji;
+    } else {
+      q.textContent = '';
+    }
+  },
+
+  _renderContent(task) {
+    const el = document.getElementById('content-area');
+    el.innerHTML = '';
+
+    if (task.type === TaskType.ORDINAL_POSITION) {
+      const row = document.createElement('div');
+      row.className = 'emoji-row';
+      task.items.forEach((item, idx) => {
+        const span = document.createElement('span');
+        span.className = 'emoji-item tappable';
+        span.textContent = item.emoji;
+        span.dataset.index = idx;
+        span.addEventListener('click', () => {
+          this.vm.submitPositionTap(parseInt(idx));
+        });
+        row.appendChild(span);
+      });
+      el.appendChild(row);
+    } else if (task.items.length > 0) {
+      const container = document.createElement('div');
+      container.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:8px;';
+      task.items.forEach(item => {
+        const span = document.createElement('span');
+        span.className = 'emoji-item';
+        span.textContent = item.emoji;
+        container.appendChild(span);
+      });
+      el.appendChild(container);
+    }
+  },
+
+  _renderOptions(task) {
+    const el = document.getElementById('options-area');
+    el.innerHTML = '';
+
+    if (task.type === TaskType.ORDINAL_POSITION) return;
+
+    task.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.dataset.index = idx;
+
+      if (this._isEmojiString(opt.label)) {
+        const d = document.createElement('div');
+        d.className = 'option-display';
+        d.textContent = opt.label;
+        btn.appendChild(d);
+      } else {
+        btn.textContent = opt.label;
+      }
+
+      btn.addEventListener('click', () => {
+        this.vm.submitAnswer(parseInt(idx));
+      });
+      el.appendChild(btn);
+    });
+  },
+
+  _isEmojiString(label) {
+    return /[\u{1F300}-\u{1F9FF}]/u.test(label);
+  },
+
+  _updateTaskProgress() {
+    const el = document.getElementById('game-counter');
+    if (el) el.textContent = `${this.vm.lessonTaskIndex} / 4`;
+  },
+
+  // ============================================================
+  // Feedback
+  // ============================================================
+  _updateFeedback() {
+    const state = this.vm.feedbackState;
+    if (state === null) return;
+    Animations.flash(state === 'correct' ? 'green' : 'red');
+  },
+
+  _onCorrect() {
+    Animations.pulseCorrect(this._getCorrectElement());
+    Animations.confetti();
+    Speech.speakCorrect();
+  },
+
+  _onWrong() {
+    Speech.speakWrong();
+  },
+
+  _getCorrectElement() {
+    const task = this.vm.currentTaskData;
+    if (!task) return null;
+    if (task.type === TaskType.ORDINAL_POSITION) {
+      const items = document.querySelectorAll('.emoji-item.tappable');
+      return items[task.correctIndex] || null;
+    } else {
+      const btns = document.querySelectorAll('.option-btn');
+      const idx = task.options.findIndex(o => o.isCorrect);
+      return btns[idx] || null;
+    }
+  },
+
+  // ============================================================
+  // Stars
+  // ============================================================
+  _updateStars() {
+    const digit = this.vm.currentDigit;
+    const stars = this.vm.getStarsForDigit(digit);
+    const el = document.getElementById('game-stars');
+    if (el) {
+      el.innerHTML = Array.from({ length: 3 }, (_, i) => i < stars ? '⭐' : '☆').join('');
+    }
+  },
+
+  // ============================================================
+  // Hints
+  // ============================================================
+  _showHint() {
+    const task = this.vm.currentTaskData;
+    if (!task || !task.hintData) return;
+
+    if (task.type === TaskType.ORDINAL_POSITION) {
+      const items = document.querySelectorAll('.emoji-item.tappable');
+      task.hintData.highlightItems.forEach(i => {
+        if (items[i]) items[i].classList.add('hint-highlight');
+      });
+    } else {
+      const btns = document.querySelectorAll('.option-btn');
+      const idx = task.hintData.highlightOptionIndex;
+      if (btns[idx]) btns[idx].classList.add('correct-hint');
+    }
+  },
+
+  _hideHint() {
+    Animations.hideHint();
+  },
+
+  // ============================================================
+  // Reward
+  // ============================================================
+  _showReward(detail) {
+    Animations.confetti();
+
+    const mascot = document.getElementById('reward-mascot');
+    const title = document.getElementById('reward-title');
+    const msg = document.getElementById('reward-message');
+    const nextBtn = document.getElementById('btn-next-digit');
+
+    mascot.textContent = '🎉';
+    title.textContent = 'Отлично!';
+    msg.textContent = `Цифра ${detail.digit} выучена!`;
+
+    const [, max] = this._getRangeInfo().range.split('-').map(Number);
+    nextBtn.style.display = detail.digit < max ? 'block' : 'none';
+  },
+};
+
+window.UI = UI;
