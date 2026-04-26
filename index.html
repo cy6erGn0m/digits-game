@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Изучаем цифры</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+
+        <!-- 1. Заставка -->
+        <section id="splash" class="screen active">
+            <div class="splash-content">
+                <div class="mascot">👋</div>
+                <h1>Изучаем цифры</h1>
+                <button class="btn-primary" id="btn-start">Играть</button>
+            </div>
+        </section>
+
+        <!-- 2. Выбор уровня сложности -->
+        <section id="level-select" class="screen">
+            <div class="screen-header">
+                <div class="stars-display" id="total-stars"></div>
+            </div>
+            <div class="screen-body">
+                <h2>Выбери уровень</h2>
+                <div class="level-grid">
+                    <button class="level-card" data-difficulty="easy-fixed" data-distraction="easy">
+                        <span class="level-emoji">🌟</span>
+                        <span class="level-title">Легко</span>
+                        <span class="level-desc">Одна цифра</span>
+                    </button>
+                    <button class="level-card" data-difficulty="easy-random" data-distraction="easy">
+                        <span class="level-emoji">🌟</span>
+                        <span class="level-title">Легко</span>
+                        <span class="level-desc">Разные цифры</span>
+                    </button>
+                    <button class="level-card" data-difficulty="medium-random" data-distraction="medium">
+                        <span class="level-emoji">🌟🌟</span>
+                        <span class="level-title">Средне</span>
+                        <span class="level-desc">1–10</span>
+                    </button>
+                    <button class="level-card" data-difficulty="hard-random" data-distraction="hard">
+                        <span class="level-emoji">🌟🌟🌟</span>
+                        <span class="level-title">Сложно</span>
+                        <span class="level-desc">1–20</span>
+                    </button>
+                </div>
+                <button class="btn-text" id="btn-back-to-splash">← Назад</button>
+            </div>
+        </section>
+
+        <!-- 3. Выбор цифры -->
+        <section id="digit-select" class="screen">
+            <div class="screen-header">
+                <div class="stars-display" id="level-stars"></div>
+                <button class="btn-icon" id="btn-change-level">⚙️</button>
+            </div>
+            <div class="screen-body">
+                <h2 id="digit-select-title">Учим цифры</h2>
+                <div class="digit-grid" id="digit-grid"></div>
+                <button class="btn-text" id="btn-back-to-levels">← Уровни</button>
+            </div>
+        </section>
+
+        <!-- 4. Игровой экран -->
+        <section id="game" class="screen">
+            <div class="game-header">
+                <div class="game-stars" id="game-stars"></div>
+                <div class="game-counter" id="game-counter"></div>
+            </div>
+            <div class="game-area">
+                <div class="question-row">
+                    <span id="question-emoji" class="question-emoji"></span>
+                    <button class="btn-speak" id="btn-speak" aria-label="Повторить">🔊</button>
+                </div>
+                <div id="task-instruction" class="task-instruction"></div>
+                <div id="content-area" class="content-area"></div>
+                <div id="options-area" class="options-area"></div>
+            </div>
+            <div class="flash-overlay" id="flash"></div>
+        </section>
+
+        <!-- 5. Экран награды -->
+        <section id="reward" class="screen">
+            <div class="reward-content">
+                <div id="reward-mascot" class="mascot reward-mascot">🎉</div>
+                <h2 id="reward-title">Молодец!</h2>
+                <div id="reward-star" class="reward-star">⭐</div>
+                <p id="reward-message" class="reward-message"></p>
+                <div class="reward-actions">
+                    <button class="btn-primary" id="btn-next-digit">Дальше →</button>
+                    <button class="btn-text" id="btn-menu">В меню</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Экран завершения уровня -->
+        <section id="completion" class="screen">
+            <div class="completion-content">
+                <div class="mascot">🏆</div>
+                <h2>Поздравляем!</h2>
+                <p class="completion-text">Ты выучил все цифры этого уровня!</p>
+                <div class="completion-actions">
+                    <button class="btn-primary" id="restart-btn">Играть снова</button>
+                    <button class="btn-text" id="btn-back-to-splash-2">В меню</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div id="confetti-container"></div>
+
+    <script src="progress.js"></script>
+    <script src="tasks.js"></script>
+    <script src="speech.js"></script>
+    <script src="model.js"></script>
+    <script src="animations.js"></script>
+    <script src="ui.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
