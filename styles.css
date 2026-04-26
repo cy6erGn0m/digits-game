@@ -318,18 +318,19 @@ button {
 .content-area .emoji-row {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 4px;
+    max-width: 95vw;
 }
 
 .content-area .emoji-row .row-emoji {
-    font-size: 2.5rem;
+    font-size: 2rem;
     border: 2px solid #ddd;
     border-radius: 8px;
-    padding: 4px;
-    margin: 2px;
+    padding: 2px 4px;
     cursor: pointer;
     transition: transform 0.1s, border-color 0.1s;
+    flex-shrink: 0;
 }
 
 .content-area .emoji-row .row-emoji:active {
@@ -407,13 +408,20 @@ button {
 }
 
 .flash-overlay.flash-green {
-    background: rgba(76, 175, 80, 0.4);
+    background: rgba(76, 175, 80, 0.5);
     opacity: 1;
 }
 
 .flash-overlay.flash-red {
-    background: rgba(244, 67, 54, 0.35);
+    background: rgba(255, 82, 82, 0.6);
     opacity: 1;
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
 }
 
 /* ============================================

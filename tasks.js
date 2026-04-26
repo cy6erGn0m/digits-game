@@ -211,7 +211,7 @@ const TaskGenerators = {
     const shuffled = shuffle(quantities);
     const pluralLabel = (RUSSIAN_PLURALS[pool.type] || 'фруктов');
     const options = shuffled.map(q => ({
-      label: `${emoji.repeat(q)} (${q})`,
+      label: emoji.repeat(q),
       isCorrect: q === target,
     }));
 
