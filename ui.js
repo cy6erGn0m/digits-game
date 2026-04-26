@@ -14,6 +14,12 @@ const UI = {
     this.vm = vm;
     this._bindNavigation();
     this._subscribe();
+    
+    // Hide speech button if speech synthesis is not available
+    const speakButton = document.getElementById('btn-speak');
+    if (speakButton) {
+      speakButton.style.display = Speech.enabled ? 'block' : 'none';
+    }
   },
 
   // ============================================================

@@ -243,8 +243,10 @@ const TaskGenerators = {
     const pool = randomFrom(Object.values(EMOJI_POOLS));
     const emoji = randomFrom(pool.emojis);
 
-    const possible = [1, Math.max(1, target - 1)].filter(n => n > 0 && n < target);
-    const start = randomFrom(possible);
+    // Ensure the correct answer is 0, 1, or 2
+    // So start must be target, target-1, or target-2
+    const possibleStarts = [target, target-1, target-2].filter(n => n > 0);
+    const start = randomFrom(possibleStarts);
     const correctAdd = target - start;
 
     const items = Array(start).fill({ emoji, color: pool.color, type: pool.type });
@@ -255,7 +257,7 @@ const TaskGenerators = {
       { label: '+2', isCorrect: correctAdd === 2, delta: 2 },
     ]);
 
-const question = `Добавь, чтобы стало ${RUSSIAN_NUMBERS[target]}`;
+    const question = `Добавь, чтобы стало ${RUSSIAN_NUMBERS[target]}`;
 
     return {
       id, type: TaskType.ADD_TO_REACH,

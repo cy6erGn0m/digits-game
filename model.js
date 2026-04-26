@@ -165,19 +165,31 @@ class AppViewModel extends EventTarget {
 
   // ---- Lesson tasks ----
   /**
-   * Generate 4 tasks for current lesson (one of each type, shuffled).
+   * Generate 7 tasks for current lesson (multiple instances of task types, shuffled).
+   * Task types can repeat but specific tasks have different content.
    * For easy levels: exclude addToReach. For random mode: different digit per task.
    */
   _generateLessonTasks() {
     const rangeMax = this.getRangeMax();
-    const types = [
+    const allTypes = [
       TaskType.COUNT_TO_DIGIT,
       TaskType.DIGIT_TO_COUNT,
       TaskType.ORDINAL_POSITION,
     ];
+    
+    // Add ADD_TO_REACH for non-easy levels
     if (!this.isEasyLevel()) {
-      types.push(TaskType.ADD_TO_REACH);
+      allTypes.push(TaskType.ADD_TO_REACH);
     }
+    
+    // Create array of 7 task types with potential repeats
+    const types = [];
+    for (let i = 0; i < 7; i++) {
+      // Randomly select a type, but favor fundamental types like COUNT_TO_DIGIT
+      const type = Math.random() < 0.4 ? TaskType.COUNT_TO_DIGIT : randomFrom(allTypes);
+      types.push(type);
+    }
+    
     shuffle(types);
 
     if (this.isRandomMode()) {
