@@ -377,6 +377,13 @@ button {
     transition: transform 0.15s, border-color 0.15s;
 }
 
+.emoji-grid {
+    display: block;
+    column-count: 2;
+    column-gap: 4px;
+    line-height: 1.2;
+}
+
 .option-btn:hover, .option-btn:active {
     border-color: #6c63ff;
     transform: scale(0.92);
