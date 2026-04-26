@@ -31,10 +31,10 @@ Get default progress object.
 **Returns:** Default progress data:
 ```javascript
 {
-  completedDigits: { easy: [], medium: [], hard: [] },
+  completedDigits: { 'easy-fixed': [], 'easy-random': [], 'medium-random': [], 'hard-random': [] },
   stars: 0,
   starsByDigit: {},
-  currentDifficulty: 'easy',
+  currentDifficulty: 'easy-fixed',
   distractionLevel: 'none'
 }
 ```

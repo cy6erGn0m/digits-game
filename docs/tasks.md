@@ -19,7 +19,7 @@ Number to Russian word mapping (1-20).
 
 ### RUSSIAN_ORDINALS
 
-Number to Russian ordinal word mapping (1-10).
+Number to Russian ordinal word mapping (1-20).
 
 ### RUSSIAN_PLURALS
 
@@ -27,7 +27,7 @@ Emoji type to Russian plural noun mapping.
 
 ### EMOJI_POOLS
 
-Emoji categories: animals, fruits, shapes, nature, objects.
+Emoji categories: animals (🐶🐱🐰🦊🐻🐼), fruits (🍎🍊🍋🍇🍓🍑), balls (⚽🏀🏈⚾🎾🏐), flowers (🌸🌺🌻🌷🌹🌼), objects (🚗✈️🚀🚂🚲🎁).
 
 ### DISTINCTION_LEVELS
 
@@ -46,7 +46,7 @@ DISTINCTION_LEVELS.OVERLAP        // 'overlap'
 shuffle(arr: any[]): any[]
 ```
 
-Shuffle array in place using Fisher-Yates algorithm.
+Shuffle array using Fisher-Yates algorithm (returns a new copy).
 
 ### randomInt
 

@@ -31,7 +31,7 @@ Constructor. Initializes game state, loads progress from storage.
 setDifficulty(value: string): void
 ```
 
-Set game difficulty (easy/medium/hard).
+Set game difficulty ('easy-fixed'|'easy-random'|'medium-random'|'hard-random').
 
 ### setDistraction
 
@@ -61,8 +61,40 @@ startSession(difficulty: string, distraction: string): void
 Start a new game session. Finds next incomplete digit and begins lesson.
 
 **Parameters:**
-- `difficulty` — 'easy'|'medium'|'hard'
+- `difficulty` — 'easy-fixed'|'easy-random'|'medium-random'|'hard-random'
 - `distraction` — Distraction level
+
+### setFixedDigit
+
+```
+setFixedDigit(value: boolean): void
+```
+
+Set whether digit is fixed per lesson or random per task.
+
+### isRandomMode
+
+```
+isRandomMode(): boolean
+```
+
+Check if current mode is random (different digit each task).
+
+### isEasyLevel
+
+```
+isEasyLevel(): boolean
+```
+
+Check if current difficulty is easy level.
+
+### getRangeMax
+
+```
+getRangeMax(): number
+```
+
+Get range maximum for current difficulty.
 
 ### restartLevel
 

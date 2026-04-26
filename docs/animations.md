@@ -54,7 +54,7 @@ Pulse animation on correct element.
 Animations.showHint(task: Object): void
 ```
 
-Show hint on element (called from UI layer).
+Show hint on element (currently unused — hint logic is handled inline in UI layer).
 
 **Parameters:**
 - `task` — Task object
@@ -80,6 +80,6 @@ Spawn confetti particles (60 pieces, 5s duration).
 The following CSS animations are defined in styles.css:
 
 - `flash-green` — Green screen flash (300ms)
-- `flash-red` — Red screen flash (300ms)
+- `flash-red` — Red screen flash (500ms)
 - `pulse-green` — Green pulse on correct element (500ms)
 - `confetti-fall` — Confetti piece falling animation (2-4s)
