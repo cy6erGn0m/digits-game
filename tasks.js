@@ -305,12 +305,11 @@ const question = `Добавь, чтобы стало ${RUSSIAN_NUMBERS[target]}
     const ordinal = RUSSIAN_ORDINALS[target] || `№${target}`;
     const question = `Нажми на ${ordinal}`;
 
-// Clearly show which position: "1st" "2nd" etc with the emoji
+// Show which position: just the number (e.g., "1-й", "2-й")
     const questionEmoji = `
-      <span style="font-size:2.5rem;font-weight:bold;color:#2d3a8c;">
+      <span style="font-size:3rem;font-weight:bold;color:#2d3a8c;">
         ${target}-й
       </span>
-      <span style="font-size:1.5rem;">(${emoji})</span>
     `;
 
     const ordinalWord = RUSSIAN_ORDINALS[target] || `${target}-й`;
