@@ -167,7 +167,7 @@ class AppViewModel extends EventTarget {
   /**
    * Generate 7 tasks for current lesson (multiple instances of task types, shuffled).
    * Task types can repeat but specific tasks have different content.
-   * For easy levels: exclude addToReach. For random mode: different digit per task.
+   * addToReach is included only on hard-random. For random mode: different digit per task.
    */
   _generateLessonTasks() {
     const rangeMax = this.getRangeMax();
@@ -176,9 +176,9 @@ class AppViewModel extends EventTarget {
       TaskType.DIGIT_TO_COUNT,
       TaskType.ORDINAL_POSITION,
     ];
-    
-    // Add ADD_TO_REACH for non-easy levels
-    if (!this.isEasyLevel()) {
+
+    // Add ADD_TO_REACH only for hard-random
+    if (this.difficulty === 'hard-random') {
       allTypes.push(TaskType.ADD_TO_REACH);
     }
     

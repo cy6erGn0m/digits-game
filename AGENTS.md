@@ -78,7 +78,7 @@ Each lesson = 7 tasks shuffled.
 |-------|-------|------|-------|
 | easy-fixed | 1-5 | Same digit all tasks | 7 (no addToReach) |
 | easy-random | 1-5 | Random each task | 7 (no addToReach) |
-| medium-random | 1-10 | Random each task | 7 |
+| medium-random | 1-10 | Random each task | 7 (no addToReach) |
 | hard-random | 1-20 | Random each task | 7 |
 
 - **Random modes** skip digit-select screen, go directly to game
