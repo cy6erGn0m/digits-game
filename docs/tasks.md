@@ -160,7 +160,7 @@ Add to Reach. Show items + "?", user picks +0/+1/+2.
 TaskGenerators.ordinalPosition(target: number, max: number, distractionLevel: string): Object
 ```
 
-Ordinal Position. Show a row of emojis, user taps the Nth one.
+Ordinal Position. Show a row of emojis, user taps the Nth one. The row size is dynamically calculated as a random value between `Math.max(10, target)` and `Math.min(20, max + 3)` to ensure there are always enough items for the target position and sufficient space for the snake layout.
 
 **Parameters:**
 - `target` — Ordinal number (1-based)
@@ -174,7 +174,7 @@ Ordinal Position. Show a row of emojis, user taps the Nth one.
 - `questionAudio` — Spoken question
 - `questionEmoji` — HTML showing position + emoji
 - `questionLabel` — Position label (e.g., "1-й")
-- `items` — Array of emoji items in the row
+- `items` — Array of emoji items in the row (size varies between `Math.max(10, target)` and `Math.min(20, max + 3)`)
 - `options` — Empty array (tap on content area instead)
 - `correctIndex` — Index of correct item counting forward (0-based)
 - `correctIndexBackward` — Index of correct item counting backward from the end (0-based)
