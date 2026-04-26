@@ -13,7 +13,7 @@ if ! git diff-index --quiet HEAD --; then
   STASH_NEEDED=true
 fi
 
-FILES=$(git ls-tree -r HEAD -- '*.html' '*.css' '*.js' | awk '{print $4}')
+FILES=$(git ls-files '*.html' '*.css' '*.js')
 
 if [ -z "$FILES" ]; then
   echo "No .html/.css/.js files found in $BRANCH_SOURCE"
