@@ -304,6 +304,7 @@ const TaskGenerators = {
     const rowSize = randomInt(Math.max(5, target + 2), Math.min(10, max + 3));
     const items = Array(rowSize).fill({ emoji, color: pool.color, type: pool.type });
     const correctIndex = target - 1;
+    const correctIndexBackward = rowSize - target;
     const ordinal = RUSSIAN_ORDINALS[target] || `№${target}`;
     const question = `Нажми на ${ordinal}`;
 
@@ -326,8 +327,13 @@ const TaskGenerators = {
       items,
       options: [],
       correctIndex,
+      correctIndexBackward,
       distractionFlags: this._distractionFlags(distractionLevel),
-      hintData: { highlightItems: [correctIndex] },
+      hintData: {
+        highlightItems: correctIndex === correctIndexBackward
+          ? [correctIndex]
+          : [correctIndex, correctIndexBackward],
+      },
     };
   },
 

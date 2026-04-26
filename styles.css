@@ -338,6 +338,10 @@ button {
     border-color: #6c63ff;
 }
 
+.content-area .emoji-row .row-emoji.hint-highlight {
+    animation: hint-glow 1s ease-in-out;
+}
+
 .content-area .question-mark {
     font-size: 4rem;
     color: #c0c8e0;
