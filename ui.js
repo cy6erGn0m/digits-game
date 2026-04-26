@@ -267,9 +267,9 @@ const UI = {
     el.innerHTML = '';
 
     if (task.type === TaskType.ORDINAL_POSITION) {
-      const row = document.createElement('div');
-      row.className = 'emoji-row';
-      row.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:flex-start;gap:6px;';
+      const container = document.createElement('div');
+      container.className = 'emoji-row';
+      container.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:flex-start;gap:6px;';
       task.items.forEach((item, idx) => {
         const span = document.createElement('span');
         span.className = 'row-emoji';
@@ -278,9 +278,10 @@ const UI = {
         span.addEventListener('click', () => {
           this.vm.submitPositionTap(parseInt(idx));
         });
-        row.appendChild(span);
+        container.appendChild(span);
       });
-      el.appendChild(row);
+      el.appendChild(container);
+      this._applySnakeLayout(container);
     } else if (task.items.length > 0) {
       const container = document.createElement('div');
       container.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:8px;';
@@ -375,8 +376,8 @@ task.options.forEach((opt, idx) => {
     const task = this.vm.currentTaskData;
     if (!task) return null;
     if (task.type === TaskType.ORDINAL_POSITION) {
-      const items = document.querySelectorAll('.emoji-item.tappable');
-      return items[task.correctIndex] || null;
+      const items = document.querySelectorAll('.row-emoji');
+      return [...items].find(el => parseInt(el.dataset.index) === task.correctIndex) || null;
     } else {
       const btns = document.querySelectorAll('.option-btn');
       const idx = task.options.findIndex(o => o.isCorrect);
@@ -410,9 +411,10 @@ task.options.forEach((opt, idx) => {
     if (!task || !task.hintData) return;
 
     if (task.type === TaskType.ORDINAL_POSITION) {
-      const items = document.querySelectorAll('.emoji-item.tappable');
+      const items = document.querySelectorAll('.row-emoji');
       task.hintData.highlightItems.forEach(i => {
-        if (items[i]) items[i].classList.add('hint-highlight');
+        const target = [...items].find(el => parseInt(el.dataset.index) === i);
+        if (target) target.classList.add('hint-highlight');
       });
     } else {
       const btns = document.querySelectorAll('.option-btn');
@@ -449,6 +451,60 @@ task.options.forEach((opt, idx) => {
 
     const [, max] = this._getRangeInfo().range.split('-').map(Number);
     nextBtn.style.display = detail.digit < max ? 'block' : 'none';
+  },
+
+  /**
+   * Apply snake layout with visible turn indicators.
+   * Pattern: LTR → single turn at right edge → RTL → single turn at left edge → LTR …
+   * The first element of each natural row after a direction change becomes a standalone
+   * "turn" marker, right/left-aligned to show where the snake turns.
+   * @param {HTMLElement} container - The flex-wrap container to restructure
+   */
+  _applySnakeLayout(container) {
+    const items = [...container.children];
+    if (items.length < 2) return;
+
+    const naturalRows = [[items[0]]];
+    for (let i = 1; i < items.length; i++) {
+      if (items[i].offsetTop !== items[i - 1].offsetTop) {
+        naturalRows.push([items[i]]);
+      } else {
+        naturalRows[naturalRows.length - 1].push(items[i]);
+      }
+    }
+
+    const outputRows = [];
+    let ltr = true;
+
+    naturalRows.forEach((row, ri) => {
+      if (ri === 0) {
+        outputRows.push({ items: row, align: 'flex-start', reverse: false });
+        return;
+      }
+      if (ltr) {
+        outputRows.push({ items: [row[0]], align: 'flex-end', reverse: false });
+        if (row.length > 1) {
+          outputRows.push({ items: row.slice(1), align: 'flex-end', reverse: true });
+        }
+      } else {
+        outputRows.push({ items: [row[0]], align: 'flex-start', reverse: false });
+        if (row.length > 1) {
+          outputRows.push({ items: row.slice(1), align: 'flex-start', reverse: false });
+        }
+      }
+      ltr = !ltr;
+    });
+
+    container.innerHTML = '';
+    container.style.cssText = 'display:flex;flex-direction:column;align-items:stretch;gap:4px;';
+
+    outputRows.forEach(({ items: rowItems, align, reverse }) => {
+      const rowDiv = document.createElement('div');
+      rowDiv.style.cssText = `display:flex;flex-wrap:nowrap;gap:6px;justify-content:${align};`;
+      const ordered = reverse ? [...rowItems].reverse() : rowItems;
+      ordered.forEach(item => rowDiv.appendChild(item));
+      container.appendChild(rowDiv);
+    });
   },
 };
 

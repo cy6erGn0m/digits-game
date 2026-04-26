@@ -46,9 +46,10 @@ const Animations = {
    */
   showHint(task) {
     if (task.type === TaskType.ORDINAL_POSITION) {
-      const items = document.querySelectorAll('.emoji-item.tappable');
+      const items = document.querySelectorAll('.row-emoji');
       const idx = task.correctIndex;
-      if (items[idx]) items[idx].classList.add('hint-highlight');
+      const target = [...items].find(el => parseInt(el.dataset.index) === idx);
+      if (target) target.classList.add('hint-highlight');
     } else {
       const btns = document.querySelectorAll('.option-btn');
       const idx = task.options.findIndex(o => o.isCorrect);

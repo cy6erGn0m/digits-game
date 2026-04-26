@@ -182,6 +182,8 @@ _getCorrectElement(): Element|null
 
 Get the correct element for pulse animation.
 
+For `ordinalPosition` tasks, finds the emoji by matching `dataset.index` against `task.correctIndex` (works even after snake layout reordering). For other tasks, returns the correct option button.
+
 **Returns:** Correct option button or emoji item
 
 ### Stars
@@ -204,6 +206,8 @@ _showHint(): void
 
 Show hint by highlighting correct answer.
 
+For `ordinalPosition` tasks, highlights emojis by matching `dataset.index` against `task.hintData.highlightItems` (survives snake layout reordering). For other tasks, highlights the correct option button.
+
 #### _hideHint
 
 ```
@@ -211,6 +215,24 @@ _hideHint(): void
 ```
 
 Hide hint by removing highlight classes.
+
+### Layout
+
+#### _applySnakeLayout
+
+```
+_applySnakeLayout(container: HTMLElement): void
+```
+
+Restructures an ordinal-position emoji row into a snake layout with visible turn indicators.
+
+- Detects natural row breaks via `offsetTop` while the container still uses flex-wrap.
+- First natural row is left-aligned (LTR).
+- Each subsequent natural row is split: the first element becomes a standalone turn marker (right-aligned for LTR→RTL, left-aligned for RTL→LTR), and the remaining elements form the continuation row flowing in the new direction.
+- The container is rebuilt as a vertical flex column of per-row divs.
+
+**Parameters:**
+- `container` — The `.emoji-row` flex-wrap element to restructure
 
 ### Reward
 
