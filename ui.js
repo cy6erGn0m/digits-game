@@ -332,11 +332,11 @@ task.options.forEach((opt, idx) => {
   },
 
   /**
-   * Update task progress counter (e.g., "2 / 4").
+   * Update task progress counter (e.g., "2 / 7").
    */
   _updateTaskProgress() {
     const el = document.getElementById('game-counter');
-    if (el) el.textContent = `${this.vm.lessonTaskIndex} / 4`;
+    if (el) el.textContent = `${this.vm.lessonTaskIndex} / 7`;
   },
 
   // ============================================================

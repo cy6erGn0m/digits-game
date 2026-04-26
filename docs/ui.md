@@ -146,7 +146,7 @@ Check if label string contains emojis.
 _updateTaskProgress(): void
 ```
 
-Update task progress counter (e.g., "2 / 4").
+Update task progress counter (e.g., "2 / 7").
 
 ### Feedback
 

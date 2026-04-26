@@ -45,7 +45,7 @@ class AppViewModel extends EventTarget {
   get completedDigits() { return this.progress.completedDigits; }
 
   /**
-   * Set game difficulty (easy-fixed/easy-random/medium-fixed/...).
+   * Set game difficulty (easy-fixed/easy-random/medium-random/...).
    * @param {string} value - Difficulty level
    */
   setDifficulty(value) { this.difficulty = value; }
@@ -100,7 +100,7 @@ class AppViewModel extends EventTarget {
   /**
    * Start a new game session with given difficulty and distraction.
    * Finds next incomplete digit and begins lesson.
-   * @param {string} difficulty - 'easy-fixed'|'easy-random'|'medium-fixed'|...
+   * @param {string} difficulty - 'easy-fixed'|'easy-random'|'medium-random'|...
    * @param {string} distraction - Distraction level
    */
   startSession(difficulty, distraction) {
@@ -340,7 +340,7 @@ class AppViewModel extends EventTarget {
   }
 
   /**
-   * Called when all 4 tasks complete for a digit. Marks digit as completed and shows reward.
+   * Called when all 7 tasks complete for a digit. Marks digit as completed and shows reward.
    */
   _onDigitMastered() {
     const diff = this.difficulty;
