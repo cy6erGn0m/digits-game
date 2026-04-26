@@ -408,20 +408,22 @@ button {
 }
 
 .flash-overlay.flash-green {
-    background: rgba(76, 175, 80, 0.5);
+    background: rgba(50, 200, 100, 0.6);
     opacity: 1;
 }
 
 .flash-overlay.flash-red {
-    background: rgba(255, 82, 82, 0.6);
+    background: rgba(255, 0, 100, 0.7);
     opacity: 1;
-    animation: shake 0.3s ease-in-out;
+    animation: shake 0.4s ease-in-out;
 }
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
 }
 
 /* ============================================
