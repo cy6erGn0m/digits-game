@@ -22,20 +22,13 @@ VERSION=$(node -e "const p=require('./package.json'); console.log(p.version)")
 
 echo "Releasing v$VERSION..."
 
-node -e "
-const fs = require('fs');
-const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-pkg.version = '$VERSION';
-fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
-"
-
-sed -i "18s/1.0.[0-9]*/$VERSION/" index.html
-
-git add package.json index.html
-git commit -m "Release v$VERSION"
-git tag -a "v$VERSION" -m "Release v$VERSION"
-git push "$REMOTE" "$BRANCH_SOURCE" --tags
-echo "Pushed $BRANCH_SOURCE with tag v$VERSION"
+if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+  echo "Tag v$VERSION already exists"
+  git push "$REMOTE" "refs/tags/v$VERSION" --force 2>/dev/null || echo "Tag v$VERSION force-pushed"
+else
+  git tag -a "v$VERSION" -m "Release v$VERSION"
+  git push "$REMOTE" "$BRANCH_SOURCE" --tags
+fi
 
 MAJOR=$(echo $VERSION | cut -d. -f1)
 MINOR=$(echo $VERSION | cut -d. -f2)
@@ -54,7 +47,7 @@ fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
 
 sed -i "18s/1.0.[0-9]*/$NEW_VERSION/" index.html
 
-git add package.json index.html
+git add package.json index.html sync-web.sh
 git commit -m "Prepare for next release: v$NEW_VERSION"
 
 FILES=$(git ls-files '*.html' '*.css' '*.js')
@@ -67,12 +60,7 @@ fi
 COUNT=$(echo "$FILES" | wc -l)
 echo "Syncing $COUNT files from $BRANCH_SOURCE to $BRANCH_TARGET..."
 
-if ! git show-ref --verify "refs/heads/$BRANCH_TARGET" > /dev/null 2>&1; then
-  git checkout --orphan "$BRANCH_TARGET"
-  git rm -rf .
-else
-  git checkout "$BRANCH_TARGET"
-fi
+git checkout "$BRANCH_TARGET"
 
 echo "$FILES" | tr '\n' '\0' | xargs -0 git checkout "$BRANCH_SOURCE" --
 
