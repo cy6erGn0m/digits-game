@@ -14,8 +14,7 @@ const ProgressStorage = {
     return {
       completedDigits: {
         'easy-fixed': [], 'easy-random': [],
-        'medium-fixed': [], 'medium-random': [],
-        'hard-fixed': [], 'hard-random': []
+        'medium-random': [], 'hard-random': []
       },
       stars: 0,
       starsByDigit: {},
@@ -60,8 +59,7 @@ const ProgressStorage = {
   reset(data) {
     data.completedDigits = {
       'easy-fixed': [], 'easy-random': [],
-      'medium-fixed': [], 'medium-random': [],
-      'hard-fixed': [], 'hard-random': []
+      'medium-random': [], 'hard-random': []
     };
     data.stars = 0;
     data.starsByDigit = {};

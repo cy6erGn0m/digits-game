@@ -83,8 +83,7 @@ class AppViewModel extends EventTarget {
   getRangeMax() {
     const rangeMap = {
       'easy-fixed': 5, 'easy-random': 5,
-      'medium-fixed': 10, 'medium-random': 10,
-      'hard-fixed': 20, 'hard-random': 20
+      'medium-random': 10, 'hard-random': 20
     };
     return rangeMap[this.difficulty] || 5;
   }
