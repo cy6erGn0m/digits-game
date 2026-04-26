@@ -49,6 +49,13 @@ button {
     height: 100%;
 }
 
+.version-display {
+    font-size: 0.65rem;
+    color: #aaa;
+    text-align: center;
+    margin-top: 8px;
+}
+
 /* ============================================
    SPLASH SCREEN
    ============================================ */

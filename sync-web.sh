@@ -6,12 +6,41 @@ BRANCH_TARGET="web"
 REMOTE="gh"
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-STASH_NEEDED=false
-if ! git diff-index --quiet HEAD --; then
-  echo "Stashing uncommitted changes..."
-  git stash push -m "sync-web-temp"
-  STASH_NEEDED=true
+
+if ! git diff-index --quiet HEAD -- '*.html' '*.css' '*.js' 'package.json' 2>/dev/null; then
+  echo "Error: there are uncommitted changes in source files. Please commit or stash them first."
+  git status --short '*.html' '*.css' '*.js' 'package.json'
+  exit 1
 fi
+
+if ! command -v node &> /dev/null; then
+  echo "Error: node is required for versioning"
+  exit 1
+fi
+
+VERSION=$(node -e "const p=require('./package.json'); console.log(p.version)")
+MAJOR=$(echo $VERSION | cut -d. -f1)
+MINOR=$(echo $VERSION | cut -d. -f2)
+PATCH=$(echo $VERSION | cut -d. -f3)
+NEW_PATCH=$((PATCH + 1))
+NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+
+echo "Bumping version: $VERSION -> $NEW_VERSION"
+
+node -e "
+const fs = require('fs');
+const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+pkg.version = '$NEW_VERSION';
+fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+"
+
+sed -i "s/id=\"app-version\">[^<]*/id=\"app-version\">$NEW_VERSION/" index.html
+
+git add package.json index.html
+git commit -m "Release v$NEW_VERSION"
+git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
+git push "$REMOTE" "$BRANCH_SOURCE" --tags
+echo "Pushed $BRANCH_SOURCE with tag v$NEW_VERSION"
 
 FILES=$(git ls-files '*.html' '*.css' '*.js')
 
@@ -35,15 +64,11 @@ echo "$FILES" | tr '\n' '\0' | xargs -0 git checkout "$BRANCH_SOURCE" --
 if git diff-index --cached --quiet HEAD -- 2>/dev/null; then
   echo "No changes to commit."
 else
-  git commit -m "Sync $COUNT source files from $BRANCH_SOURCE ($(date +%Y-%m-%d))"
+  git commit -m "Sync $COUNT source files from $BRANCH_SOURCE (v$NEW_VERSION)"
   git push "$REMOTE" "$BRANCH_TARGET"
   echo "Pushed to $REMOTE/$BRANCH_TARGET"
 fi
 
 git checkout "$CURRENT_BRANCH"
-if $STASH_NEEDED; then
-  git stash pop
-  echo "Stash restored."
-fi
 
-echo "Done."
+echo "Done. Version v$NEW_VERSION published."
