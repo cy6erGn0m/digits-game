@@ -170,7 +170,7 @@ const TaskGenerators = {
     }));
 
     const question = `Сколько ${pluralLabel}?`;
-    const questionEmoji = `<span style="font-size:3rem">${emoji}</span>`;
+    const questionEmoji = '';
 
     return {
       id, type: TaskType.COUNT_TO_DIGIT,
