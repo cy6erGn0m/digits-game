@@ -1,7 +1,7 @@
 /**
- * @file animations.js
- * Animations — pure CSS animations, no dependencies. Handles flash, pulse, confetti, and hints.
- */
+  * @file animations.js
+  * Animations — pure CSS animations, no dependencies. Handles flash, pulse, confetti, and hints.
+  */
 
 const Animations = {
   /**
@@ -12,7 +12,7 @@ const Animations = {
     const el = document.getElementById('flash');
     el.className = 'flash-overlay';
     el.classList.add(color === 'green' ? 'flash-green' : 'flash-red');
-    setTimeout(() => { el.className = 'flash-overlay'; }, 300);
+    setTimeout(() => { el.className = 'flash-overlay'; }, color === 'green' ? 300 : 500);
   },
 
   /**
