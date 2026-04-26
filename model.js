@@ -19,8 +19,9 @@ class AppViewModel extends EventTarget {
     this.currentTask = null;
     this.taskQueue = [];
     this.currentDigit = 1;
-    this.difficulty = 'easy';
+    this.difficulty = 'easy-fixed';
     this.distraction = DistractionLevel.NONE;
+    this.isFixedDigit = true;
 
     this.feedback = null;
     this.showHint = false;
@@ -44,15 +45,49 @@ class AppViewModel extends EventTarget {
   get completedDigits() { return this.progress.completedDigits; }
 
   /**
-   * Set game difficulty (easy/medium/hard).
+   * Set game difficulty (easy-fixed/easy-random/medium-fixed/...).
    * @param {string} value - Difficulty level
    */
   setDifficulty(value) { this.difficulty = value; }
+  /**
+   * Set whether digit is fixed per lesson or random per task.
+   * @param {boolean} value - True for fixed, false for random
+   */
+  setFixedDigit(value) { this.isFixedDigit = value; }
   /**
    * Set distraction level.
    * @param {string} value - Distraction level
    */
   setDistraction(value) { this.distraction = value; }
+
+  /**
+   * Check if current mode is random (different digit each task).
+   * @returns {boolean}
+   */
+  isRandomMode() {
+    return this.difficulty.includes('random');
+  }
+
+  /**
+   * Check if current difficulty is easy level.
+   * @returns {boolean}
+   */
+  isEasyLevel() {
+    return this.difficulty.startsWith('easy');
+  }
+
+  /**
+   * Get range maximum for current difficulty.
+   * @returns {number}
+   */
+  getRangeMax() {
+    const rangeMap = {
+      'easy-fixed': 5, 'easy-random': 5,
+      'medium-fixed': 10, 'medium-random': 10,
+      'hard-fixed': 20, 'hard-random': 20
+    };
+    return rangeMap[this.difficulty] || 5;
+  }
 
   /**
    * Navigate to a screen.
@@ -66,17 +101,18 @@ class AppViewModel extends EventTarget {
   /**
    * Start a new game session with given difficulty and distraction.
    * Finds next incomplete digit and begins lesson.
-   * @param {string} difficulty - 'easy'|'medium'|'hard'
+   * @param {string} difficulty - 'easy-fixed'|'easy-random'|'medium-fixed'|...
    * @param {string} distraction - Distraction level
    */
   startSession(difficulty, distraction) {
     this.difficulty = difficulty;
     this.distraction = distraction;
+    this.isFixedDigit = !difficulty.includes('random');
     this.progress.currentDifficulty = difficulty;
     this.progress.distractionLevel = distraction;
     this._saveProgress();
 
-    const rangeMax = { easy: 5, medium: 10, hard: 20 }[difficulty];
+    const rangeMax = this.getRangeMax();
     const completed = this.progress.completedDigits[difficulty] || [];
     const nextDigit = Array.from({ length: rangeMax }, (_, i) => i + 1)
       .find(d => !completed.includes(d));
@@ -131,16 +167,30 @@ class AppViewModel extends EventTarget {
   // ---- Lesson tasks ----
   /**
    * Generate 4 tasks for current lesson (one of each type, shuffled).
+   * For easy levels: exclude addToReach. For random mode: different digit per task.
    */
   _generateLessonTasks() {
-    const rangeMax = { easy: 5, medium: 10, hard: 20 }[this.difficulty];
-    const types = shuffle([
+    const rangeMax = this.getRangeMax();
+    const types = [
       TaskType.COUNT_TO_DIGIT,
       TaskType.DIGIT_TO_COUNT,
-      TaskType.ADD_TO_REACH,
       TaskType.ORDINAL_POSITION,
-    ]);
-    this.taskQueue = types.map(type => this._createTask(type, this.currentDigit, rangeMax));
+    ];
+    if (!this.isEasyLevel()) {
+      types.push(TaskType.ADD_TO_REACH);
+    }
+    shuffle(types);
+
+    if (this.isRandomMode()) {
+      this.taskQueue = types.map(type => {
+        const digit = randomInt(1, rangeMax);
+        return this._createTask(type, digit, rangeMax);
+      });
+    } else {
+      this.taskQueue = types.map(type =>
+        this._createTask(type, this.currentDigit, rangeMax)
+      );
+    }
     this.lessonTaskIndex = 0;
   }
 
@@ -297,7 +347,7 @@ class AppViewModel extends EventTarget {
    * Continue to next digit after reward screen.
    */
   continueFromReward() {
-    const rangeMax = { easy: 5, medium: 10, hard: 20 }[this.difficulty];
+    const rangeMax = this.getRangeMax();
     const completed = this.progress.completedDigits[this.difficulty] || [];
     const nextDigit = Array.from({ length: rangeMax }, (_, i) => i + 1)
       .find(d => !completed.includes(d) && d > this.currentDigit);

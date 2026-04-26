@@ -12,10 +12,14 @@ const ProgressStorage = {
    */
   defaults() {
     return {
-      completedDigits: { easy: [], medium: [], hard: [] },
+      completedDigits: {
+        'easy-fixed': [], 'easy-random': [],
+        'medium-fixed': [], 'medium-random': [],
+        'hard-fixed': [], 'hard-random': []
+      },
       stars: 0,
       starsByDigit: {},
-      currentDifficulty: 'easy',
+      currentDifficulty: 'easy-fixed',
       distractionLevel: 'none',
     };
   },
@@ -54,7 +58,11 @@ const ProgressStorage = {
    * @param {Object} data - Progress data to reset
    */
   reset(data) {
-    data.completedDigits = { easy: [], medium: [], hard: [] };
+    data.completedDigits = {
+      'easy-fixed': [], 'easy-random': [],
+      'medium-fixed': [], 'medium-random': [],
+      'hard-fixed': [], 'hard-random': []
+    };
     data.stars = 0;
     data.starsByDigit = {};
     this.save(data);

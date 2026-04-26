@@ -26,20 +26,35 @@
             <div class="screen-body">
                 <h2>Выбери уровень</h2>
                 <div class="level-grid">
-                    <button class="level-card" data-range="1-5" data-distraction="easy">
+                    <button class="level-card" data-difficulty="easy-fixed" data-distraction="easy">
                         <span class="level-emoji">🌟</span>
                         <span class="level-title">Легко</span>
-                        <span class="level-desc">Цифры 1–5</span>
+                        <span class="level-desc">Одна цифра</span>
                     </button>
-                    <button class="level-card" data-range="1-10" data-distraction="medium">
+                    <button class="level-card" data-difficulty="easy-random" data-distraction="easy">
+                        <span class="level-emoji">🌟</span>
+                        <span class="level-title">Легко</span>
+                        <span class="level-desc">Разные цифры</span>
+                    </button>
+                    <button class="level-card" data-difficulty="medium-fixed" data-distraction="medium">
                         <span class="level-emoji">🌟🌟</span>
                         <span class="level-title">Средне</span>
-                        <span class="level-desc">Цифры 1–10</span>
+                        <span class="level-desc">Одна цифра</span>
                     </button>
-                    <button class="level-card" data-range="1-20" data-distraction="hard">
+                    <button class="level-card" data-difficulty="medium-random" data-distraction="medium">
+                        <span class="level-emoji">🌟🌟</span>
+                        <span class="level-title">Средне</span>
+                        <span class="level-desc">Разные цифры</span>
+                    </button>
+                    <button class="level-card" data-difficulty="hard-fixed" data-distraction="hard">
                         <span class="level-emoji">🌟🌟🌟</span>
                         <span class="level-title">Сложно</span>
-                        <span class="level-desc">Цифры 1–20</span>
+                        <span class="level-desc">Одна цифра</span>
+                    </button>
+                    <button class="level-card" data-difficulty="hard-random" data-distraction="hard">
+                        <span class="level-emoji">🌟🌟🌟</span>
+                        <span class="level-title">Сложно</span>
+                        <span class="level-desc">Разные цифры</span>
                     </button>
                 </div>
                 <button class="btn-text" id="btn-back-to-splash">← Назад</button>

@@ -33,15 +33,19 @@ const UI = {
       this.vm.navigate('splash');
     });
 
-    // Level cards → set difficulty, then go to digit-select
+    // Level cards → set difficulty, then go to digit-select or task
     document.querySelectorAll('.level-card').forEach(card => {
       card.addEventListener('click', () => {
-        const range = card.dataset.range;
-        const difficulty = range === '1-5' ? 'easy' : range === '1-10' ? 'medium' : 'hard';
+        const difficulty = card.dataset.difficulty;
+        const distraction = card.dataset.distraction === 'easy' ? DistractionLevel.NONE : DistractionLevel.TYPE_FILTER;
         this.vm.setDifficulty(difficulty);
-        this.vm.setDistraction(card.dataset.distraction === 'easy' ? DistractionLevel.NONE : DistractionLevel.TYPE_FILTER);
+        this.vm.setDistraction(distraction);
 
-        this.vm.navigate('digit-select');
+        if (difficulty.includes('random')) {
+          this.vm.startSession(difficulty, distraction);
+        } else {
+          this.vm.navigate('digit-select');
+        }
       });
     });
 
@@ -187,11 +191,11 @@ const UI = {
    */
   _getRangeInfo() {
     const d = this.vm.difficulty;
-    console.log('vm.difficulty =', d);
-    return {
-      range: d === 'easy' ? '1-5' : d === 'medium' ? '1-10' : '1-20',
-      dist: d,
-    };
+    let range;
+    if (d.includes('easy')) range = '1-5';
+    else if (d.includes('medium')) range = '1-10';
+    else range = '1-20';
+    return { range, dist: d };
   },
 
   // ============================================================
@@ -212,31 +216,16 @@ const UI = {
   },
 
   /**
-   * Render task instruction text based on task type.
+   * Render task instruction text from task.instruction field.
    * @param {Object} task - Task object
    */
   _renderInstruction(task) {
     const el = document.getElementById('task-instruction');
     el.innerHTML = '';
-    
-    // Show task-specific instructions
-    let text = '';
-    switch (task.type) {
-      case TaskType.COUNT_TO_DIGIT:
-        text = 'Сколько? Нажми на правильную цифру';
-        break;
-      case TaskType.DIGIT_TO_COUNT:
-        text = 'Найди нужную группу';
-        break;
-      case TaskType.ADD_TO_REACH:
-        text = 'Сколько добавить?';
-        break;
-      case TaskType.ORDINAL_POSITION:
-        text = `Нажди на ${task.questionLabel} в ряду ниже`;
-        break;
-    }
-    if (text) {
-      el.textContent = text;
+
+    if (task.instruction) {
+      el.textContent = task.instruction;
+      el.style.cssText = 'font-size:0.85rem;color:#888;margin:8px 0;text-align:center;';
     }
   },
 
@@ -274,9 +263,10 @@ const UI = {
     if (task.type === TaskType.ORDINAL_POSITION) {
       const row = document.createElement('div');
       row.className = 'emoji-row';
+      row.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:flex-start;gap:6px;';
       task.items.forEach((item, idx) => {
         const span = document.createElement('span');
-        span.className = 'emoji-item tappable';
+        span.className = 'row-emoji';
         span.textContent = item.emoji;
         span.dataset.index = idx;
         span.addEventListener('click', () => {

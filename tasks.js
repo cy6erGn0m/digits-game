@@ -27,6 +27,9 @@ const RUSSIAN_NUMBERS = {
 const RUSSIAN_ORDINALS = {
   1: 'первый', 2: 'второй', 3: 'третий', 4: 'четвёртый', 5: 'пятый',
   6: 'шестой', 7: 'седьмой', 8: 'восьмой', 9: 'девятый', 10: 'десятый',
+  11: 'одиннадцатый', 12: 'двенадцатый', 13: 'тринадцатый',
+  14: 'четырнадцатый', 15: 'пятнадцатый', 16: 'шестнадцатый',
+  17: 'семнадцатый', 18: 'восемнадцатый', 19: 'девятнадцатый', 20: 'двадцатый',
 };
 
 const RUSSIAN_PLURALS = {
@@ -174,6 +177,7 @@ const TaskGenerators = {
       targetNumber: target,
       questionAudio: question,
       questionEmoji,
+      instruction: 'Сколько?',
       items,
       options,
       correctIndex: undefined,
@@ -218,6 +222,7 @@ const TaskGenerators = {
       targetNumber: target,
       questionAudio: question,
       questionEmoji: `<span style="font-size:5rem;font-weight:800;color:#2d3a8c">${target}</span>`,
+      instruction: 'Найди',
       items: [],
       options,
       correctIndex: undefined,
@@ -238,7 +243,7 @@ const TaskGenerators = {
     const pool = randomFrom(Object.values(EMOJI_POOLS));
     const emoji = randomFrom(pool.emojis);
 
-    const possible = [0, 1, Math.max(0, target - 1)].filter(n => n < target);
+    const possible = [1, Math.max(1, target - 1)].filter(n => n > 0 && n < target);
     const start = randomFrom(possible);
     const correctAdd = target - start;
 
@@ -250,7 +255,7 @@ const TaskGenerators = {
       { label: '+2', isCorrect: correctAdd === 2, delta: 2 },
     ]);
 
-    const question = `Добавь, чтобы стало ${RUSSIAN_NUMBERS[target]}`;
+const question = `Добавь, чтобы стало ${RUSSIAN_NUMBERS[target]}`;
 
     return {
       id, type: TaskType.ADD_TO_REACH,
@@ -258,6 +263,7 @@ const TaskGenerators = {
       startCount: start,
       questionAudio: question,
       questionEmoji: this._buildAddToReachContent(start, target, emoji),
+      instruction: 'Добавь',
       items,
       options,
       correctIndex: undefined,
@@ -267,14 +273,14 @@ const TaskGenerators = {
   },
 
   /**
- * Build HTML content for addToReach task (shows items + ? = target).
+   * Build HTML content for addToReach task (shows items + ? = target).
  * @param {number} start - Starting count
  * @param {number} target - Target count
  * @param {string} emoji - Emoji to display
  * @returns {string} HTML string
  */
   _buildAddToReachContent(start, target, emoji) {
-    const content = start === 0 ? '' : Array(start).fill(`<span style="font-size:3rem">${emoji}</span>`).join('');
+    const content = Array(start).fill(`<span style="font-size:3rem">${emoji}</span>`).join('');
     return `<span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
       ${content ? `<span>${content}</span>` : ''}
       <span style="font-size:3rem;color:#c0c8e0">?</span>
@@ -299,7 +305,7 @@ const TaskGenerators = {
     const ordinal = RUSSIAN_ORDINALS[target] || `№${target}`;
     const question = `Нажми на ${ordinal}`;
 
-    // Clearly show which position: "1st" "2nd" etc with the emoji
+// Clearly show which position: "1st" "2nd" etc with the emoji
     const questionEmoji = `
       <span style="font-size:2.5rem;font-weight:bold;color:#2d3a8c;">
         ${target}-й
@@ -307,12 +313,15 @@ const TaskGenerators = {
       <span style="font-size:1.5rem;">(${emoji})</span>
     `;
 
+    const ordinalWord = RUSSIAN_ORDINALS[target] || `${target}-й`;
+
     return {
       id, type: TaskType.ORDINAL_POSITION,
       targetNumber: target,
       questionAudio: question,
       questionEmoji,
-      questionLabel: `${target}-й`, // fallback
+      questionLabel: `${target}-й`,
+      instruction: `Нажми на ${ordinalWord}`,
       items,
       options: [],
       correctIndex,
@@ -322,7 +331,7 @@ const TaskGenerators = {
   },
 
   /**
- * Generate distraction flags for a task based on distraction level.
+   * Generate distraction flags for a task based on distraction level.
  * @param {string} level - Distraction level ('none'|'colors'|'filter'|'overlap')
  * @returns {Object} Flags object with allSameEmoji, allSameColor, filterByType, itemsOverlap
  */
