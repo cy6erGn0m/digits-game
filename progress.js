@@ -31,7 +31,9 @@ const ProgressStorage = {
         const p = JSON.parse(raw);
         return { ...this.defaults(), ...p };
       }
-    } catch {}
+    } catch {
+      // Ignore localStorage errors
+    }
     return this.defaults();
   },
 
@@ -42,7 +44,9 @@ const ProgressStorage = {
   save(data) {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-    } catch {}
+    } catch {
+      // Ignore localStorage errors
+    }
   },
 
   /**

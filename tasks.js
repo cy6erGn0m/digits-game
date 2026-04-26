@@ -93,12 +93,13 @@ function randomFrom(arr) {
 }
 
 /**
- * Clamp value between min and max.
+ * Clamp value between min and max (reserved for future use).
  * @param {number} v - Value to clamp
  * @param {number} min - Minimum
  * @param {number} max - Maximum
  * @returns {number} Clamped value
  */
+// eslint-disable-next-line no-unused-vars
 function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v));
 }
