@@ -211,7 +211,7 @@ const TaskGenerators = {
     const shuffled = shuffle(quantities);
     const pluralLabel = (RUSSIAN_PLURALS[pool.type] || 'фруктов');
     const options = shuffled.map(q => ({
-      label: emoji.repeat(q),
+      label: `<span class="emoji-grid">${emoji.repeat(q)}</span>`,
       isCorrect: q === target,
     }));
 
@@ -264,7 +264,7 @@ const TaskGenerators = {
       targetNumber: target,
       startCount: start,
       questionAudio: question,
-      questionEmoji: this._buildAddToReachContent(start, target, emoji),
+      questionEmoji: '',
       instruction: 'Добавь',
       items,
       options,
@@ -272,22 +272,6 @@ const TaskGenerators = {
       distractionFlags: this._distractionFlags(distractionLevel),
       hintData: { highlightOptionIndex: options.findIndex(o => o.isCorrect) },
     };
-  },
-
-  /**
-   * Build HTML content for addToReach task (shows items + ? = target).
- * @param {number} start - Starting count
- * @param {number} target - Target count
- * @param {string} emoji - Emoji to display
- * @returns {string} HTML string
- */
-  _buildAddToReachContent(start, target, emoji) {
-    const content = Array(start).fill(`<span style="font-size:3rem">${emoji}</span>`).join('');
-    return `<span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
-      ${content ? `<span>${content}</span>` : ''}
-      <span style="font-size:3rem;color:#c0c8e0">?</span>
-      <span style="font-size:2rem;color:#666">= ${target}</span>
-    </span>`;
   },
 
 /**
@@ -301,7 +285,7 @@ const TaskGenerators = {
     const id = this.newId();
     const pool = randomFrom(Object.values(EMOJI_POOLS));
     const emoji = randomFrom(pool.emojis);
-    const rowSize = randomInt(Math.max(5, target + 2), Math.min(10, max + 3));
+    const rowSize = randomInt(Math.max(10, target), Math.min(20, max + 3));
     const items = Array(rowSize).fill({ emoji, color: pool.color, type: pool.type });
     const correctIndex = target - 1;
     const correctIndexBackward = rowSize - target;

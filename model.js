@@ -167,7 +167,7 @@ class AppViewModel extends EventTarget {
   /**
    * Generate 7 tasks for current lesson (multiple instances of task types, shuffled).
    * Task types can repeat but specific tasks have different content.
-   * For easy levels: exclude addToReach. For random mode: different digit per task.
+   * addToReach is included only on hard-random. For random mode: different digit per task.
    */
   _generateLessonTasks() {
     const rangeMax = this.getRangeMax();
@@ -176,9 +176,9 @@ class AppViewModel extends EventTarget {
       TaskType.DIGIT_TO_COUNT,
       TaskType.ORDINAL_POSITION,
     ];
-    
-    // Add ADD_TO_REACH for non-easy levels
-    if (!this.isEasyLevel()) {
+
+    // Add ADD_TO_REACH only for hard-random
+    if (this.difficulty === 'hard-random') {
       allTypes.push(TaskType.ADD_TO_REACH);
     }
     
@@ -194,7 +194,12 @@ class AppViewModel extends EventTarget {
 
     if (this.isRandomMode()) {
       this.taskQueue = types.map(type => {
-        const digit = randomInt(1, rangeMax);
+        let digit;
+        if (type === TaskType.ORDINAL_POSITION) {
+          digit = randomInt(2, rangeMax);
+        } else {
+          digit = randomInt(1, rangeMax);
+        }
         return this._createTask(type, digit, rangeMax);
       });
     } else {
@@ -343,6 +348,12 @@ class AppViewModel extends EventTarget {
    * Called when all 7 tasks complete for a digit. Marks digit as completed and shows reward.
    */
   _onDigitMastered() {
+    if (this.isRandomMode()) {
+      this.screen = 'completion';
+      this._emit('screenChanged');
+      return;
+    }
+
     const diff = this.difficulty;
     if (!this.progress.completedDigits[diff]) this.progress.completedDigits[diff] = [];
     if (!this.progress.completedDigits[diff].includes(this.currentDigit)) {
@@ -364,18 +375,11 @@ class AppViewModel extends EventTarget {
       .find(d => !completed.includes(d) && d > this.currentDigit);
 
     if (nextDigit) {
-      this.currentDigit = nextDigit;
+      this.startDigitLesson(nextDigit);
     } else {
       this.screen = 'completion';
       this._emit('screenChanged');
-      return;
     }
-
-    this.isLessonComplete = false;
-    this._generateLessonTasks();
-    this.screen = 'task';
-    this._emit('screenChanged');
-    this._nextTaskFromQueue();
   }
 
   /**

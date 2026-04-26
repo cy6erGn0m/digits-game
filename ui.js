@@ -249,7 +249,7 @@ const UI = {
       qDiv.innerHTML = task.questionEmoji;
       qDiv.style.cssText = 'font-size:3rem;margin-bottom:8px;';
       q.appendChild(qDiv);
-    } else if (task.type !== TaskType.COUNT_TO_DIGIT && task.items.length > 0) {
+    } else if (task.type !== TaskType.COUNT_TO_DIGIT && task.type !== TaskType.ADD_TO_REACH && task.items.length > 0) {
       // Show sample only for non-count tasks
       const typeEmoji = document.createElement('span');
       typeEmoji.style.cssText = 'font-size:3rem;margin-bottom:8px;';
@@ -282,6 +282,27 @@ const UI = {
       });
       el.appendChild(container);
       this._applySnakeLayout(container);
+    } else if (task.type === TaskType.ADD_TO_REACH) {
+      const container = document.createElement('div');
+      container.style.cssText = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;';
+      const itemsWrap = document.createElement('span');
+      itemsWrap.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:8px;';
+      task.items.forEach(item => {
+        const span = document.createElement('span');
+        span.className = 'emoji-item';
+        span.textContent = item.emoji;
+        itemsWrap.appendChild(span);
+      });
+      container.appendChild(itemsWrap);
+      const qMark = document.createElement('span');
+      qMark.style.cssText = 'font-size:3rem;color:#c0c8e0;';
+      qMark.textContent = '?';
+      container.appendChild(qMark);
+      const eq = document.createElement('span');
+      eq.style.cssText = 'font-size:2rem;color:#666;';
+      eq.textContent = `= ${task.targetNumber}`;
+      container.appendChild(eq);
+      el.appendChild(container);
     } else if (task.items.length > 0) {
       const container = document.createElement('div');
       container.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:8px;';
