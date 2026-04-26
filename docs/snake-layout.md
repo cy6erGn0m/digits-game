@@ -24,6 +24,9 @@ The snake layout solves this by making the visual flow continuous, like reading 
 
 **Additionally**, to make the direction change explicit, the first item of each wrapped row is pulled out as a standalone **turn indicator** on its own line, aligned to the edge where the turn happens.
 
+**Accepting both directions:**  
+Because children may naturally count from either end of the row, the game accepts **both** the forward-counted N-th position and the backward-counted N-th position as correct answers. For example, in a row of 7 items asked for the 3rd, both item 3 (forward) and item 5 (backward) are valid.
+
 ---
 
 ## Desired Visual Pattern
@@ -214,6 +217,6 @@ If code looked up the 6th item by `container.children[5]`, it would find item **
 
 ## Related Files
 
-- `ui.js` — `UI._applySnakeLayout()`, `UI._renderContent()`, `UI._getCorrectElement()`, `UI._showHint()`
+- `ui.js` — `UI._applySnakeLayout()`, `UI._renderContent()`, `UI._getCorrectElements()`, `UI._showHint()`
 - `animations.js` — `Animations.showHint()`
 - `styles.css` — `.emoji-row`, `.row-emoji`, `.row-emoji.hint-highlight`

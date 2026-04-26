@@ -258,7 +258,8 @@ class AppViewModel extends EventTarget {
     if (!this.currentTask || this.feedback === 'correct' ||
         this.currentTask.type !== TaskType.ORDINAL_POSITION) return;
 
-    const isCorrect = itemIndex === this.currentTask.correctIndex;
+    const task = this.currentTask;
+    const isCorrect = itemIndex === task.correctIndex || itemIndex === task.correctIndexBackward;
     if (isCorrect) {
       this.feedback = 'correct';
       this.consecutiveErrors = 0;

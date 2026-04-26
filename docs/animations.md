@@ -54,7 +54,7 @@ Pulse animation on correct element.
 Animations.showHint(task: Object): void
 ```
 
-Show hint on element. For `ordinalPosition` tasks, highlights the emoji whose `dataset.index` matches `task.correctIndex`. For other tasks, highlights the correct option button.
+Show hint on element. For `ordinalPosition` tasks, highlights all emojis whose `dataset.index` matches any index in `task.hintData.highlightItems` (forward and backward correct positions). For other tasks, highlights the correct option button.
 
 **Parameters:**
 - `task` — Task object

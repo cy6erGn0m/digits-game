@@ -174,17 +174,17 @@ _onWrong(): void
 
 Handle wrong answer — voice feedback.
 
-#### _getCorrectElement
+#### _getCorrectElements
 
 ```
-_getCorrectElement(): Element|null
+_getCorrectElements(): Element[]
 ```
 
-Get the correct element for pulse animation.
+Get all correct elements for pulse animation.
 
-For `ordinalPosition` tasks, finds the emoji by matching `dataset.index` against `task.correctIndex` (works even after snake layout reordering). For other tasks, returns the correct option button.
+For `ordinalPosition` tasks, finds all emojis whose `dataset.index` appears in `task.hintData.highlightItems` (includes both forward and backward correct positions). For other tasks, returns the correct option button in an array.
 
-**Returns:** Correct option button or emoji item
+**Returns:** Array of correct option buttons or emoji items
 
 ### Stars
 

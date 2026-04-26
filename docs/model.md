@@ -142,6 +142,8 @@ submitPositionTap(itemIndex: number): void
 
 Submit answer for ordinal position task (tap on emoji row).
 
+Accepts both forward-counting and backward-counting positions as correct.
+
 **Parameters:**
 - `itemIndex` — Index of tapped emoji
 

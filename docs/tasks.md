@@ -176,8 +176,9 @@ Ordinal Position. Show a row of emojis, user taps the Nth one.
 - `questionLabel` — Position label (e.g., "1-й")
 - `items` — Array of emoji items in the row
 - `options` — Empty array (tap on content area instead)
-- `correctIndex` — Index of correct item (0-based)
-- `hintData` — {highlightItems: [correctIndex]}
+- `correctIndex` — Index of correct item counting forward (0-based)
+- `correctIndexBackward` — Index of correct item counting backward from the end (0-based)
+- `hintData` — {highlightItems: [correctIndex, correctIndexBackward]} (deduplicated when both indices coincide)
 
 ### TaskGenerators._distractionFlags
 

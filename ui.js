@@ -355,7 +355,7 @@ task.options.forEach((opt, idx) => {
    * Handle correct answer — pulse animation, confetti, voice.
    */
   _onCorrect() {
-    Animations.pulseCorrect(this._getCorrectElement());
+    this._getCorrectElements().forEach(el => Animations.pulseCorrect(el));
     Animations.confetti();
     Speech.speakCorrect();
   },
@@ -369,19 +369,22 @@ task.options.forEach((opt, idx) => {
   },
 
   /**
-   * Get the correct element for pulse animation.
-   * @returns {Element|null} Correct option button or emoji item
+   * Get all correct elements for pulse animation.
+   * @returns {Element[]} Correct option buttons or emoji items
    */
-  _getCorrectElement() {
+  _getCorrectElements() {
     const task = this.vm.currentTaskData;
-    if (!task) return null;
+    if (!task) return [];
     if (task.type === TaskType.ORDINAL_POSITION) {
       const items = document.querySelectorAll('.row-emoji');
-      return [...items].find(el => parseInt(el.dataset.index) === task.correctIndex) || null;
+      const indices = task.hintData?.highlightItems || [task.correctIndex];
+      return indices
+        .map(idx => [...items].find(el => parseInt(el.dataset.index) === idx))
+        .filter(Boolean);
     } else {
       const btns = document.querySelectorAll('.option-btn');
       const idx = task.options.findIndex(o => o.isCorrect);
-      return btns[idx] || null;
+      return btns[idx] ? [btns[idx]] : [];
     }
   },
 
