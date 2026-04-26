@@ -16,11 +16,28 @@
 ### File Structure
 ```
 digits/
-├── index.html      # 6 screen sections (splash, difficulty, digit-select, task, reward, completion)
+├── index.html      # 6 screen sections (splash, level-select, digit-select, game, reward, completion)
 ├── styles.css      # Mobile-first responsive CSS, animations, confetti
-├── app.js          # AppViewModel + UI controller + Animations
-└── server.py       # python -m http.server / python3 server.py
-```
+├── app.js         # Main entry, wires VM + UI together
+├── model.js       # AppViewModel (game state, navigation, answer handling)
+├── ui.js          # UIController (DOM rendering, event handling)
+├── tasks.js       # TaskGenerators (4 task types)
+├── progress.js    # localStorage persistence
+├── speech.js      # Web Speech API wrapper
+├── animations.js  # Confetti, flash effects
+├── server.py      # Simple HTTP server
+└── docs/          # API documentation (auto-generated from JSDoc)
+    ├── README.md   # API reference index
+    ├── app.md      # Entry point
+    ├── model.md    # AppViewModel
+    ├── ui.md       # UI controller
+    ├── tasks.md    # Task generators
+    ├── progress.md # Progress storage
+    ├── speech.md   # Voice synthesis
+    └── animations.md # Visual animations
+
+> **Note:** After modifying any JS file, update the corresponding doc file in `docs/`.
+> Run the documentation generator to regenerate API docs from JSDoc comments.
 
 ## 3. Screens
 

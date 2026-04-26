@@ -1,5 +1,11 @@
 /**
- * Task generators — creates task objects for each type
+ * @file tasks.js
+ * Task generators — creates task objects for each of the 4 task types.
+ * Each generator returns a task object with question, options, items, and hint data.
+ *
+ * @example
+ * const task = TaskGenerators.countToDigit(3, 10, 'none');
+ * // Returns: { id, type, targetNumber, questionAudio, questionEmoji, items, options, hintData }
  */
 
 const TaskType = {
@@ -53,6 +59,11 @@ const DISTINCTION_LEVELS = {
 // УТИЛИТЫ ГЕНЕРАТОРОВ
 // ============================================================
 
+/**
+ * Shuffle array in place using Fisher-Yates algorithm.
+ * @param {any[]} arr - Array to shuffle
+ * @returns {any[]} Shuffled copy
+ */
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -62,14 +73,32 @@ function shuffle(arr) {
   return a;
 }
 
+/**
+ * Generate random integer between min and max (inclusive).
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @returns {number} Random integer
+ */
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+/**
+ * Pick random element from array.
+ * @param {any[]} arr - Source array
+ * @returns {any} Random element
+ */
 function randomFrom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+/**
+ * Clamp value between min and max.
+ * @param {number} v - Value to clamp
+ * @param {number} min - Minimum
+ * @param {number} max - Maximum
+ * @returns {number} Clamped value
+ */
 function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v));
 }
@@ -81,16 +110,26 @@ function clamp(v, min, max) {
 const TaskGenerators = {
   _idCounter: 0,
 
+  /**
+ * Generate unique task ID.
+ * @returns {string} Unique task ID
+ */
   newId() {
     return `task_${++this._idCounter}`;
   },
 
-  /**
-   * Счёт → цифра. Показать N эмодзи, выбрать правильную цифру.
-   * @param {number} target - правильное количество (1..20)
-   * @param {number} max - максимум диапазона
-   * @param {string} distractionLevel - 'none'|'colors'|'filter'
-   */
+/**
+ * @namespace TaskGenerators
+ * Factory for creating task objects. Each method generates a different task type.
+ */
+
+/**
+ * Count → Digit. Show N emojis, user picks the correct number.
+ * @param {number} target - Correct count (1..20)
+ * @param {number} max - Range maximum for option generation
+ * @param {string} distractionLevel - 'none'|'colors'|'filter'
+ * @returns {Object} Task object
+ */
   countToDigit(target, max, distractionLevel) {
     const id = this.newId();
     const pool = randomFrom(Object.values(EMOJI_POOLS));
@@ -142,12 +181,13 @@ const TaskGenerators = {
     };
   },
 
-  /**
-   * Цифра → счёт. Показать цифру, выбрать правильную группу эмодзи.
-   * @param {number} target - правильная цифра
-   * @param {number} max - максимум диапазона
-   * @param {string} distractionLevel
-   */
+/**
+ * Digit → Count. Show a digit, user picks the correct emoji group.
+ * @param {number} target - Correct digit
+ * @param {number} max - Range maximum
+ * @param {string} distractionLevel - 'none'|'colors'|'filter'
+ * @returns {Object} Task object
+ */
   digitToCount(target, max, distractionLevel) {
     const id = this.newId();
     const pool = randomFrom(Object.values(EMOJI_POOLS));
@@ -185,12 +225,13 @@ const TaskGenerators = {
     };
   },
 
-  /**
-   * Добавь до числа. Показать предметы + "?", выбрать +0/+1/+2.
-   * @param {number} target - итоговое число
-   * @param {number} max - максимум диапазона
-   * @param {string} distractionLevel
-   */
+/**
+ * Add to Reach. Show items + "?", user picks +0/+1/+2.
+ * @param {number} target - Target final number
+ * @param {number} max - Range maximum
+ * @param {string} distractionLevel - 'none'|'colors'|'filter'
+ * @returns {Object} Task object
+ */
   addToReach(target, max, distractionLevel) {
     const id = this.newId();
     const pool = randomFrom(Object.values(EMOJI_POOLS));
@@ -224,6 +265,13 @@ const TaskGenerators = {
     };
   },
 
+  /**
+ * Build HTML content for addToReach task (shows items + ? = target).
+ * @param {number} start - Starting count
+ * @param {number} target - Target count
+ * @param {string} emoji - Emoji to display
+ * @returns {string} HTML string
+ */
   _buildAddToReachContent(start, target, emoji) {
     const content = start === 0 ? '' : Array(start).fill(`<span style="font-size:3rem">${emoji}</span>`).join('');
     return `<span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
@@ -233,12 +281,13 @@ const TaskGenerators = {
     </span>`;
   },
 
-  /**
-   * Порядковый счёт. Показать ряд эмодзи, нажать нужный по счёту.
-   * @param {number} target - порядковый номер (1-based)
-   * @param {number} max - максимум диапазона
-   * @param {string} distractionLevel
-   */
+/**
+ * Ordinal Position. Show a row of emojis, user taps the Nth one.
+ * @param {number} target - Ordinal number (1-based)
+ * @param {number} max - Range maximum
+ * @param {string} distractionLevel - 'none'|'colors'|'filter'
+ * @returns {Object} Task object
+ */
   ordinalPosition(target, max, distractionLevel) {
     const id = this.newId();
     const pool = randomFrom(Object.values(EMOJI_POOLS));
@@ -271,6 +320,11 @@ const TaskGenerators = {
     };
   },
 
+  /**
+ * Generate distraction flags for a task based on distraction level.
+ * @param {string} level - Distraction level ('none'|'colors'|'filter'|'overlap')
+ * @returns {Object} Flags object with allSameEmoji, allSameColor, filterByType, itemsOverlap
+ */
   _distractionFlags(level) {
     return {
       allSameEmoji:   level === DISTINCTION_LEVELS.NONE,

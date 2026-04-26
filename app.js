@@ -1,6 +1,7 @@
 /**
- * Изучаем цифры — entry point
- * Loads modules, bootstraps AppViewModel, starts UI.
+ * @file app.js
+ * Entry point — initializes Speech, creates AppViewModel, starts UI.
+ * @requires Speech, ProgressStorage, AppViewModel, UI
  */
 
 document.addEventListener('DOMContentLoaded', () => {

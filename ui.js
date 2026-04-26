@@ -1,10 +1,15 @@
 /**
- * UI controller — управляет DOM, подписывается на события VM
+ * @file ui.js
+ * UIController — manages DOM, subscribes to VM events, updates UI.
  */
 
 const UI = {
   vm: null,
 
+  /**
+   * Initialize UI with view model.
+   * @param {AppViewModel} vm - AppViewModel instance
+   */
   init(vm) {
     this.vm = vm;
     this._bindNavigation();
@@ -14,6 +19,9 @@ const UI = {
   // ============================================================
   // Navigation bindings
   // ============================================================
+  /**
+   * Bind all navigation button click handlers.
+   */
   _bindNavigation() {
     // Splash → difficulty
     document.getElementById('btn-start').addEventListener('click', () => {
@@ -76,6 +84,9 @@ const UI = {
   // ============================================================
   // VM event subscriptions
   // ============================================================
+  /**
+   * Subscribe to all VM events.
+   */
   _subscribe() {
     const vm = this.vm;
 
@@ -94,6 +105,9 @@ const UI = {
   // ============================================================
   // Screen rendering
   // ============================================================
+  /**
+   * Show the current screen, hide others. Calls specific renderers.
+   */
   _renderScreen() {
     const screen = this.vm.currentScreen;
     
@@ -118,12 +132,18 @@ const UI = {
     if (screen === 'task') this._updateStars();
   },
 
+  /**
+   * Render level-select screen (total stars display).
+   */
   _renderLevelSelect() {
     const total = this.vm.totalStars;
     const el = document.getElementById('total-stars');
     if (el) el.textContent = total > 0 ? '⭐'.repeat(Math.min(total, 20)) : '';
   },
 
+  /**
+   * Render digit-select grid with star indicators.
+   */
   _renderDigitSelect() {
     const rangeInfo = this._getRangeInfo();
     const [min, max] = rangeInfo.range.split('-').map(Number);
@@ -161,6 +181,10 @@ const UI = {
     }
   },
 
+  /**
+   * Get range info for current difficulty.
+   * @returns {Object} {range: '1-5'|'1-10'|'1-20', dist: difficulty}
+   */
   _getRangeInfo() {
     const d = this.vm.difficulty;
     console.log('vm.difficulty =', d);
@@ -173,6 +197,9 @@ const UI = {
   // ============================================================
   // Task rendering
   // ============================================================
+  /**
+   * Render current task (question, instruction, content, options).
+   */
   _renderTask() {
     const task = this.vm.currentTaskData;
     if (!task) return;
@@ -184,6 +211,10 @@ const UI = {
     this._updateTaskProgress();
   },
 
+  /**
+   * Render task instruction text based on task type.
+   * @param {Object} task - Task object
+   */
   _renderInstruction(task) {
     const el = document.getElementById('task-instruction');
     el.innerHTML = '';
@@ -209,6 +240,10 @@ const UI = {
     }
   },
 
+  /**
+   * Render question area with emoji/number.
+   * @param {Object} task - Task object
+   */
   _renderQuestion(task) {
     const q = document.getElementById('question-emoji');
     q.innerHTML = '';
@@ -228,6 +263,10 @@ const UI = {
     }
   },
 
+  /**
+   * Render task content (emoji row or emoji group).
+   * @param {Object} task - Task object
+   */
   _renderContent(task) {
     const el = document.getElementById('content-area');
     el.innerHTML = '';
@@ -259,6 +298,10 @@ const UI = {
     }
   },
 
+  /**
+   * Render answer option buttons (not for ordinalPosition).
+   * @param {Object} task - Task object
+   */
   _renderOptions(task) {
     const el = document.getElementById('options-area');
     el.innerHTML = '';
@@ -282,10 +325,18 @@ task.options.forEach((opt, idx) => {
     }
   },
 
+  /**
+   * Check if label string contains emojis.
+   * @param {string} label - String to check
+   * @returns {boolean}
+   */
   _isEmojiString(label) {
     return /[\u{1F300}-\u{1F9FF}]/u.test(label);
   },
 
+  /**
+   * Update task progress counter (e.g., "2 / 4").
+   */
   _updateTaskProgress() {
     const el = document.getElementById('game-counter');
     if (el) el.textContent = `${this.vm.lessonTaskIndex} / 4`;
@@ -294,22 +345,35 @@ task.options.forEach((opt, idx) => {
   // ============================================================
   // Feedback
   // ============================================================
+  /**
+   * Update visual feedback (flash screen green/red).
+   */
   _updateFeedback() {
     const state = this.vm.feedbackState;
     if (state === null) return;
     Animations.flash(state === 'correct' ? 'green' : 'red');
   },
 
+  /**
+   * Handle correct answer — pulse animation, confetti, voice.
+   */
   _onCorrect() {
     Animations.pulseCorrect(this._getCorrectElement());
     Animations.confetti();
     Speech.speakCorrect();
   },
 
+  /**
+   * Handle wrong answer — voice feedback.
+   */
   _onWrong() {
     Speech.speakWrong();
   },
 
+  /**
+   * Get the correct element for pulse animation.
+   * @returns {Element|null} Correct option button or emoji item
+   */
   _getCorrectElement() {
     const task = this.vm.currentTaskData;
     if (!task) return null;
@@ -326,6 +390,9 @@ task.options.forEach((opt, idx) => {
   // ============================================================
   // Stars
   // ============================================================
+  /**
+   * Update stars display for current digit.
+   */
   _updateStars() {
     const digit = this.vm.currentDigit;
     const stars = this.vm.getStarsForDigit(digit);
@@ -338,6 +405,9 @@ task.options.forEach((opt, idx) => {
   // ============================================================
   // Hints
   // ============================================================
+  /**
+   * Show hint by highlighting correct answer.
+   */
   _showHint() {
     const task = this.vm.currentTaskData;
     if (!task || !task.hintData) return;
@@ -354,6 +424,9 @@ task.options.forEach((opt, idx) => {
     }
   },
 
+  /**
+   * Hide hint by removing highlight classes.
+   */
   _hideHint() {
     Animations.hideHint();
   },
@@ -361,6 +434,10 @@ task.options.forEach((opt, idx) => {
   // ============================================================
   // Reward
   // ============================================================
+  /**
+   * Show reward screen with confetti and message.
+   * @param {Object} detail - {digit, stars}
+   */
   _showReward(detail) {
     Animations.confetti();
 

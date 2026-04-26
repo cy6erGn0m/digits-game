@@ -1,8 +1,13 @@
 /**
- * Animations — чистый CSS, нет зависимостей
+ * @file animations.js
+ * Animations — pure CSS animations, no dependencies. Handles flash, pulse, confetti, and hints.
  */
 
 const Animations = {
+  /**
+   * Flash overlay green or red.
+   * @param {string} color - 'green' or 'red'
+   */
   flash(color) {
     const el = document.getElementById('flash');
     el.className = 'flash-overlay';
@@ -10,14 +15,24 @@ const Animations = {
     setTimeout(() => { el.className = 'flash-overlay'; }, 300);
   },
 
+  /**
+   * Shortcut for flashCorrect.
+   */
   flashCorrect() {
     this.flash('green');
   },
 
+  /**
+   * Shortcut for flashWrong.
+   */
   flashWrong() {
     this.flash('red');
   },
 
+  /**
+   * Pulse animation on correct element.
+   * @param {Element} el - Element to animate
+   */
   pulseCorrect(el) {
     if (!el) return;
     el.style.animation = 'none';
@@ -25,6 +40,10 @@ const Animations = {
     el.style.animation = 'pulse-green 0.5s ease';
   },
 
+  /**
+   * Show hint on element (called from UI layer).
+   * @param {Object} task - Task object
+   */
   showHint(task) {
     if (task.type === TaskType.ORDINAL_POSITION) {
       const items = document.querySelectorAll('.emoji-item.tappable');
@@ -37,11 +56,17 @@ const Animations = {
     }
   },
 
+  /**
+   * Remove all hint highlight classes.
+   */
   hideHint() {
     document.querySelectorAll('.correct-hint').forEach(el => el.classList.remove('correct-hint'));
     document.querySelectorAll('.hint-highlight').forEach(el => el.classList.remove('hint-highlight'));
   },
 
+  /**
+   * Spawn confetti particles (60 pieces, 5s duration).
+   */
   confetti() {
     const container = document.getElementById('confetti-container');
     container.innerHTML = '';
