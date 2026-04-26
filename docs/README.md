@@ -13,6 +13,7 @@ This section contains API documentation for each module.
 - [progress.js](./progress.md) — Progress storage
 - [speech.js](./speech.md) — Voice synthesis
 - [animations.js](./animations.md) — Visual animations
+- [snake-layout.md](./snake-layout.md) — Ordinal task snake layout algorithm
 
 ## Game Levels
 

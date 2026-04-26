@@ -226,10 +226,7 @@ _applySnakeLayout(container: HTMLElement): void
 
 Restructures an ordinal-position emoji row into a snake layout with visible turn indicators.
 
-- Detects natural row breaks via `offsetTop` while the container still uses flex-wrap.
-- First natural row is left-aligned (LTR).
-- Each subsequent natural row is split: the first element becomes a standalone turn marker (right-aligned for LTR→RTL, left-aligned for RTL→LTR), and the remaining elements form the continuation row flowing in the new direction.
-- The container is rebuilt as a vertical flex column of per-row divs.
+See [snake-layout.md](./snake-layout.md) for the full reconstruction guide, visual examples, and edge cases.
 
 **Parameters:**
 - `container` — The `.emoji-row` flex-wrap element to restructure
