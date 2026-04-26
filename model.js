@@ -194,7 +194,12 @@ class AppViewModel extends EventTarget {
 
     if (this.isRandomMode()) {
       this.taskQueue = types.map(type => {
-        const digit = randomInt(1, rangeMax);
+        let digit;
+        if (type === TaskType.ORDINAL_POSITION) {
+          digit = randomInt(2, rangeMax);
+        } else {
+          digit = randomInt(1, rangeMax);
+        }
         return this._createTask(type, digit, rangeMax);
       });
     } else {
@@ -343,6 +348,12 @@ class AppViewModel extends EventTarget {
    * Called when all 7 tasks complete for a digit. Marks digit as completed and shows reward.
    */
   _onDigitMastered() {
+    if (this.isRandomMode()) {
+      this.screen = 'completion';
+      this._emit('screenChanged');
+      return;
+    }
+
     const diff = this.difficulty;
     if (!this.progress.completedDigits[diff]) this.progress.completedDigits[diff] = [];
     if (!this.progress.completedDigits[diff].includes(this.currentDigit)) {
