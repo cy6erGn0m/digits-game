@@ -302,7 +302,6 @@ class AppViewModel extends EventTarget {
       this._hintDismissTimer = setTimeout(() => this.dismissHint(), 2000);
       this._emit('hintActivated');
     }
-    this.feedback = null;
   }
 
   /**

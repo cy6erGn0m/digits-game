@@ -354,9 +354,10 @@ task.options.forEach((opt, idx) => {
   },
 
   /**
-   * Handle wrong answer — voice feedback.
+   * Handle wrong answer — flash red, voice feedback.
    */
   _onWrong() {
+    Animations.flash('red');
     Speech.speakWrong();
   },
 
