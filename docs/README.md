@@ -1,4 +1,6 @@
-# API Reference
+#  API Reference
+
+> 🎮 **Play the game online (in Russian): [cy6ergn0m.github.io/digits-game](https://cy6ergn0m.github.io/digits-game/)**
 
 This section contains API documentation for each module.
 
