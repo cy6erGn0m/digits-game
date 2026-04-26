@@ -238,13 +238,13 @@ const UI = {
     q.innerHTML = '';
     
     // Always show the question label prominently
-    if (task.questionEmoji) {
+    if (task.questionEmoji && task.questionEmoji !== '') {
       const qDiv = document.createElement('div');
       qDiv.innerHTML = task.questionEmoji;
       qDiv.style.cssText = 'font-size:3rem;margin-bottom:8px;';
       q.appendChild(qDiv);
-    } else if (task.items.length > 0) {
-      // Default to first emoji type for countToDigit
+    } else if (task.type !== TaskType.COUNT_TO_DIGIT && task.items.length > 0) {
+      // Show sample only for non-count tasks
       const typeEmoji = document.createElement('span');
       typeEmoji.style.cssText = 'font-size:3rem;margin-bottom:8px;';
       typeEmoji.textContent = task.items[0].emoji;
