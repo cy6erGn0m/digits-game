@@ -105,7 +105,7 @@ Render task instruction text based on task type.
 _renderQuestion(task: Object): void
 ```
 
-Render question area with emoji/number.
+Render question area with emoji/number. Skips sample emoji for addToReach.
 
 **Parameters:**
 - `task` — Task object
@@ -116,7 +116,7 @@ Render question area with emoji/number.
 _renderContent(task: Object): void
 ```
 
-Render task content (emoji row or emoji group).
+Render task content (emoji row, emoji group, or addToReach equation).
 
 **Parameters:**
 - `task` — Task object

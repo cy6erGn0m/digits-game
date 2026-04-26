@@ -149,7 +149,7 @@ Add to Reach. Show items + "?", user picks +0/+1/+2.
 - `targetNumber` — The target digit
 - `startCount` — Starting count
 - `questionAudio` — Spoken question
-- `questionEmoji` — HTML showing items + ? = target
+- `questionEmoji` — Empty (rendered in content area instead)
 - `items` — Array of emoji items (starting count)
 - `options` — Array of {label, isCorrect, delta} (+0, +1, +2)
 - `hintData` — {highlightOptionIndex}
@@ -193,17 +193,3 @@ Generate distraction flags for a task based on distraction level.
 
 **Returns:** Flags object with allSameEmoji, allSameColor, filterByType, itemsOverlap
 
-### TaskGenerators._buildAddToReachContent
-
-```
-TaskGenerators._buildAddToReachContent(start: number, target: number, emoji: string): string
-```
-
-Build HTML content for addToReach task (shows items + ? = target).
-
-**Parameters:**
-- `start` — Starting count
-- `target` — Target count
-- `emoji` — Emoji to display
-
-**Returns:** HTML string
