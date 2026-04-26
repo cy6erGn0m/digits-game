@@ -25,15 +25,15 @@ const UI = {
       this.vm.navigate('splash');
     });
 
-    // Level cards → start session
+    // Level cards → set difficulty, then go to digit-select
     document.querySelectorAll('.level-card').forEach(card => {
       card.addEventListener('click', () => {
         const range = card.dataset.range;
-        const dist = card.dataset.distraction;
-        const distLevel = dist === 'easy' ? DistractionLevel.NONE
-                      : dist === 'medium' ? DistractionLevel.DIFFERENT_COLORS
-                      : DistractionLevel.TYPE_FILTER;
-        this.vm.startSession(range, distLevel);
+        const difficulty = range === '1-5' ? 'easy' : range === '1-10' ? 'medium' : 'hard';
+        this.vm.setDifficulty(difficulty);
+        this.vm.setDistraction(card.dataset.distraction === 'easy' ? DistractionLevel.NONE : DistractionLevel.TYPE_FILTER);
+
+        this.vm.navigate('digit-select');
       });
     });
 
@@ -96,24 +96,26 @@ const UI = {
   // ============================================================
   _renderScreen() {
     const screen = this.vm.currentScreen;
-
+    
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
-    const map = {
-      splash:        'splash',
+    const elId = {
+      splash: 'splash',
       'level-select': 'level-select',
       'digit-select': 'digit-select',
-      task:          'game',
-      reward:        'reward',
-      completion:    'completion',
-    };
+      task: 'game',
+      reward: 'reward',
+      completion: 'completion',
+    }[screen];
 
-    const el = document.getElementById(map[screen] || screen);
-    if (el) el.classList.add('active');
+    const el = document.getElementById(elId);
+    if (!el) return;
+    
+    el.classList.add('active');
 
     if (screen === 'level-select') this._renderLevelSelect();
-    if (screen === 'digit-select')   this._renderDigitSelect();
-    if (screen === 'task')          this._updateStars();
+    if (screen === 'digit-select') this._renderDigitSelect();
+    if (screen === 'task') this._updateStars();
   },
 
   _renderLevelSelect() {
@@ -130,7 +132,9 @@ const UI = {
     if (titleEl) titleEl.textContent = `Учим ${rangeInfo.range}`;
 
     const grid = document.getElementById('digit-grid');
-    if (!grid) return;
+    if (!grid) {
+      return;
+    }
     grid.innerHTML = '';
 
     for (let d = min; d <= max; d++) {
@@ -144,11 +148,7 @@ const UI = {
         btn.innerHTML = `${d}<span class="digit-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</span>`;
       }
       btn.addEventListener('click', () => {
-        this.vm.currentDigit = d;
-        this.vm.isLessonComplete = false;
-        this.vm._generateLessonTasks();
-        this.vm.navigate('task');
-        this.vm._nextTaskFromQueue();
+        this.vm.startDigitLesson(d);
       });
       grid.appendChild(btn);
     }
@@ -163,6 +163,7 @@ const UI = {
 
   _getRangeInfo() {
     const d = this.vm.difficulty;
+    console.log('vm.difficulty =', d);
     return {
       range: d === 'easy' ? '1-5' : d === 'medium' ? '1-10' : '1-20',
       dist: d,
@@ -177,19 +178,53 @@ const UI = {
     if (!task) return;
 
     this._renderQuestion(task);
+    this._renderInstruction(task);
     this._renderContent(task);
     this._renderOptions(task);
     this._updateTaskProgress();
   },
 
+  _renderInstruction(task) {
+    const el = document.getElementById('task-instruction');
+    el.innerHTML = '';
+    
+    // Show task-specific instructions
+    let text = '';
+    switch (task.type) {
+      case TaskType.COUNT_TO_DIGIT:
+        text = 'Сколько? Нажми на правильную цифру';
+        break;
+      case TaskType.DIGIT_TO_COUNT:
+        text = 'Найди нужную группу';
+        break;
+      case TaskType.ADD_TO_REACH:
+        text = 'Сколько добавить?';
+        break;
+      case TaskType.ORDINAL_POSITION:
+        text = `Нажди на ${task.questionLabel} в ряду ниже`;
+        break;
+    }
+    if (text) {
+      el.textContent = text;
+    }
+  },
+
   _renderQuestion(task) {
     const q = document.getElementById('question-emoji');
+    q.innerHTML = '';
+    
+    // Always show the question label prominently
     if (task.questionEmoji) {
-      q.innerHTML = task.questionEmoji;
+      const qDiv = document.createElement('div');
+      qDiv.innerHTML = task.questionEmoji;
+      qDiv.style.cssText = 'font-size:3rem;margin-bottom:8px;';
+      q.appendChild(qDiv);
     } else if (task.items.length > 0) {
-      q.textContent = task.items[0].emoji;
-    } else {
-      q.textContent = '';
+      // Default to first emoji type for countToDigit
+      const typeEmoji = document.createElement('span');
+      typeEmoji.style.cssText = 'font-size:3rem;margin-bottom:8px;';
+      typeEmoji.textContent = task.items[0].emoji;
+      q.appendChild(typeEmoji);
     }
   },
 
@@ -230,25 +265,21 @@ const UI = {
 
     if (task.type === TaskType.ORDINAL_POSITION) return;
 
-    task.options.forEach((opt, idx) => {
+task.options.forEach((opt, idx) => {
       const btn = document.createElement('button');
       btn.className = 'option-btn';
+      btn.innerHTML = opt.label;
       btn.dataset.index = idx;
-
-      if (this._isEmojiString(opt.label)) {
-        const d = document.createElement('div');
-        d.className = 'option-display';
-        d.textContent = opt.label;
-        btn.appendChild(d);
-      } else {
-        btn.textContent = opt.label;
-      }
 
       btn.addEventListener('click', () => {
         this.vm.submitAnswer(parseInt(idx));
       });
       el.appendChild(btn);
     });
+    
+    if (el.children.length === 0) {
+      console.log('WARNING: No options rendered! options empty:', task.options);
+    }
   },
 
   _isEmojiString(label) {

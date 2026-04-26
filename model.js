@@ -33,6 +33,9 @@ class AppViewModel extends EventTarget {
   get totalStars()       { return this.progress.stars; }
   get completedDigits() { return this.progress.completedDigits; }
 
+  setDifficulty(value) { this.difficulty = value; }
+  setDistraction(value) { this.distraction = value; }
+
   navigate(screen) {
     this.screen = screen;
     this._emit('screenChanged');
@@ -72,6 +75,15 @@ class AppViewModel extends EventTarget {
     this._emit('screenChanged');
   }
 
+  startDigitLesson(digit) {
+    this.currentDigit = digit;
+    this.isLessonComplete = false;
+    this._generateLessonTasks();
+    this.screen = 'task';
+    this._emit('screenChanged');
+    this._nextTaskFromQueue();
+  }
+
   resetProgress() {
     this._progressStorage.reset(this.progress);
     this.screen = 'splash';
@@ -101,6 +113,7 @@ class AppViewModel extends EventTarget {
       this.currentTask = this.taskQueue.shift();
       this.lessonTaskIndex++;
       this._emit('taskChanged');
+      this._emit('audioRequested', this.currentTask.questionAudio);
     } else {
       this.isLessonComplete = true;
       this._onDigitMastered();
