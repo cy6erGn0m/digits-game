@@ -5,7 +5,7 @@
 **Name:** Изучаем цифры (Learning Digits)
 **Type:** Single-page HTML/JavaScript game for children (ages 2–4)
 **Stack:** Vanilla HTML + CSS + JS, no build tools, simple HTTP server
-**Purpose:** Teach children to recognize numbers 1–20, count objects, and use ordinal numbers through a Duolingo-style mobile-first game
+**Purpose:** Teach children to recognize numbers 1-20, count objects, and use ordinal numbers through a Duolingo-style mobile-first game
 
 ## 2. Architecture
 
@@ -26,7 +26,7 @@ digits/
 ├── speech.js      # Web Speech API wrapper
 ├── animations.js  # Confetti, flash effects
 ├── server.py      # Simple HTTP server
-└── docs/          # API documentation (auto-generated from JSDoc)
+└── docs/          # API documentation
     ├── README.md   # API reference index
     ├── app.md      # Entry point
     ├── model.md    # AppViewModel
@@ -35,18 +35,18 @@ digits/
     ├── progress.md # Progress storage
     ├── speech.md   # Voice synthesis
     └── animations.md # Visual animations
+```
 
 > **Note:** After modifying any JS file, update the corresponding doc file in `docs/`.
-> Run the documentation generator to regenerate API docs from JSDoc comments.
 
 ## 3. Screens
 
 | Screen | ID | Purpose |
 |---|---|---|
 | Splash | `splash` | Entry point with mascot and play button |
-| Difficulty | `level-select` | Choose range (1-5 / 1-10 / 1-20) + distraction level |
-| Digit select | `digit-select` | Pick which digit to practice, shows stars per digit |
-| Game | `game` | Active task with content + 3 answer options |
+| Level select | `level-select` | Choose difficulty level (4 options) |
+| Digit select | `digit-select` | Pick which digit to practice (easy-fixed mode only), shows stars per digit |
+| Game | `game` | Active task with content + answer options |
 | Reward | `reward` | Celebration after mastering a digit (+ confetti) |
 | Completion | `completion` | Shown when all digits in a range are learned |
 
@@ -57,14 +57,14 @@ Screen transitions driven by `vm.navigate(screen)` → `screenChanged` event →
 ### Task Types
 1. **countToDigit** — show N emojis, pick the correct number
 2. **digitToCount** — show a large digit, pick the correct emoji group
-3. **addToReach** — show items + "?", pick +0 / +1 / +2
+3. **addToReach** — show items + "?", pick +1 / +2 / +3 (medium/hard only)
 4. **ordinalPosition** — show a row of emojis, tap the Nth one
 
-Each digit lesson = 4 tasks (one of each type, shuffled).
+Each lesson = 3-4 tasks shuffled.
 
 ### Feedback
-- Correct → green flash, "Молодец!" voice, confetti, auto-advance 1.5s
-- Wrong → red flash, "Попробуй ещё" voice, options stay unlocked
+- Correct → green flash + pulse, "Молодец!" voice, confetti, auto-advance 1.5s
+- Wrong → red/pink flash + shake, "Попробуй ещё" voice
 - 2 consecutive errors → visual hint (correct option highlighted for 2s)
 
 ### Star System
@@ -72,19 +72,17 @@ Each digit lesson = 4 tasks (one of each type, shuffled).
 - 3 stars on a digit = digit is "mastered"
 - Stars persist in `localStorage`
 
-## 5. Difficulty
+## 5. Difficulty Levels
 
-Two independent axes:
+| Level | Range | Mode | Tasks |
+|-------|-------|------|-------|
+| easy-fixed | 1-5 | Same digit all tasks | 3 (no addToReach) |
+| easy-random | 1-5 | Random each task | 3 (no addToReach) |
+| medium-random | 1-10 | Random each task | 4 |
+| hard-random | 1-20 | Random each task | 4 |
 
-**Axis A — Number range:**
-- Easy: 1–5
-- Medium: 1–10
-- Hard: 1–20
-
-**Axis B — Distractions:**
-- `none` (easy) — all emojis identical
-- `differentColors` (medium) — mixed emoji types
-- `typeFilter` (hard) — mixed types, filter-by-type required
+- **Random modes** skip digit-select screen, go directly to game
+- **Easy levels** exclude addToReach task type
 
 ## 6. Technical Notes
 
@@ -98,29 +96,35 @@ Two independent axes:
 - Schema:
   ```json
   {
-    "completedDigits": { "easy": [], "medium": [], "hard": [] },
+    "completedDigits": { "easy-fixed": [], "easy-random": [], "medium-random": [], "hard-random": [] },
     "stars": 0,
     "starsByDigit": { "3": 2 },
-    "currentDifficulty": "easy",
+    "currentDifficulty": "easy-fixed",
     "distractionLevel": "none"
   }
   ```
 
 ### Emoji Pools
-5 categories: `animals`, `fruits`, `shapes`, `nature`, `objects` — randomly selected per task. No external assets.
+5 categories × 6 emojis each:
+- Animals (🐶🐱🐰🦊🐻🐼)
+- Fruits (🍎🍊🍋🍇🍓🍑)
+- Balls (⚽🏀🏈⚾🎾🏐)
+- Flowers (🌸🌺🌻🌷🌹🌼)
+- Objects (🚗✈️🚀🚂🚲🎁)
+
+All from Unicode 6.0 (supported on iOS 5+, Android 4.3+).
 
 ### To Run
 ```bash
 cd digits
 python3 -m http.server 8080
-# or: python3 server.py
 ```
 Open `http://localhost:8080` on any device (optimized for mobile).
 
 ## 7. Key Decisions
 
-- **No canvas-confetti CDN** — pure CSS `animation` with JS-spawned `<div>` pieces (fewer dependencies)
-- **Hints in task model** — each generated task includes `hintData` with exact highlight targets, keeping UI logic minimal
-- **Hint auto-dismiss timer inside VM** — 2s `_hintDismissTimer` ensures UI doesn't need to manage it
-- **Hard level uses type filter in hint voice only** — actual filtering logic is a placeholder for future (not blocking MVP)
-- **Digit select screen added** — not in original spec, added for better UX (manual digit picking reflects manual difficulty selection)
+- **No canvas-confetti CDN** — pure CSS animations with JS-spawned `<div>` pieces
+- **Hints in task model** — each generated task includes `hintData` with exact highlight targets
+- **Hint auto-dismiss timer inside VM** — 2s timer ensures UI doesn't need to manage it
+- **Fixed vs Random modes** — only easy level has choice; medium/hard always random
+- **No sample emoji in questions** — avoid confusion (sample looked like item to count)
