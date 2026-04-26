@@ -364,18 +364,11 @@ class AppViewModel extends EventTarget {
       .find(d => !completed.includes(d) && d > this.currentDigit);
 
     if (nextDigit) {
-      this.currentDigit = nextDigit;
+      this.startDigitLesson(nextDigit);
     } else {
       this.screen = 'completion';
       this._emit('screenChanged');
-      return;
     }
-
-    this.isLessonComplete = false;
-    this._generateLessonTasks();
-    this.screen = 'task';
-    this._emit('screenChanged');
-    this._nextTaskFromQueue();
   }
 
   /**
