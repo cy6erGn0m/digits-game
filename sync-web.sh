@@ -19,6 +19,24 @@ if ! command -v node &> /dev/null; then
 fi
 
 VERSION=$(node -e "const p=require('./package.json'); console.log(p.version)")
+
+echo "Releasing v$VERSION..."
+
+node -e "
+const fs = require('fs');
+const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+pkg.version = '$VERSION';
+fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+"
+
+sed -i "18s/1.0.[0-9]*/$VERSION/" index.html
+
+git add package.json index.html
+git commit -m "Release v$VERSION"
+git tag -a "v$VERSION" -m "Release v$VERSION"
+git push "$REMOTE" "$BRANCH_SOURCE" --tags
+echo "Pushed $BRANCH_SOURCE with tag v$VERSION"
+
 MAJOR=$(echo $VERSION | cut -d. -f1)
 MINOR=$(echo $VERSION | cut -d. -f2)
 PATCH=$(echo $VERSION | cut -d. -f3)
@@ -34,13 +52,10 @@ pkg.version = '$NEW_VERSION';
 fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
 "
 
-sed -i "s/id=\"app-version\">[^<]*/id=\"app-version\">$NEW_VERSION/" index.html
+sed -i "18s/1.0.[0-9]*/$NEW_VERSION/" index.html
 
 git add package.json index.html
-git commit -m "Release v$NEW_VERSION"
-git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
-git push "$REMOTE" "$BRANCH_SOURCE" --tags
-echo "Pushed $BRANCH_SOURCE with tag v$NEW_VERSION"
+git commit -m "Prepare for next release: v$NEW_VERSION"
 
 FILES=$(git ls-files '*.html' '*.css' '*.js')
 
@@ -64,11 +79,11 @@ echo "$FILES" | tr '\n' '\0' | xargs -0 git checkout "$BRANCH_SOURCE" --
 if git diff-index --cached --quiet HEAD -- 2>/dev/null; then
   echo "No changes to commit."
 else
-  git commit -m "Sync $COUNT source files from $BRANCH_SOURCE (v$NEW_VERSION)"
+  git commit -m "Sync $COUNT source files from $BRANCH_SOURCE (v$VERSION)"
   git push "$REMOTE" "$BRANCH_TARGET"
   echo "Pushed to $REMOTE/$BRANCH_TARGET"
 fi
 
 git checkout "$CURRENT_BRANCH"
 
-echo "Done. Version v$NEW_VERSION published."
+echo "Done. Released v$VERSION, next version will be v$NEW_VERSION."
