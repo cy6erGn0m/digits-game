@@ -114,6 +114,13 @@ Each lesson = 7 tasks shuffled.
 
 All from Unicode 6.0 (supported on iOS 5+, Android 4.3+).
 
+### Sync to web branch
+```bash
+chmod +x sync-web.sh
+./sync-web.sh
+```
+Copies all `.html .css .js` from `main` to the unrelated `web` branch, commits, and pushes. Run after making changes that should be deployed.
+
 ### To Run
 ```bash
 cd digits
