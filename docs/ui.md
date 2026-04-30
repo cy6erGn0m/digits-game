@@ -88,6 +88,8 @@ _renderTask(): void
 
 Render current task (question, instruction, content, options).
 
+For `ordinalPosition` tasks, renders emoji spans directly. Each span calls `blur()` on click to remove focus outline.
+
 #### _renderInstruction
 
 ```
@@ -127,7 +129,7 @@ Render task content (emoji row, emoji group, or addToReach equation).
 _renderOptions(task: Object): void
 ```
 
-Render answer option buttons (not for ordinalPosition).
+Render answer option buttons (not for ordinalPosition). Each button calls `blur()` on click to remove focus outline.
 
 **Parameters:**
 - `task` — Task object
