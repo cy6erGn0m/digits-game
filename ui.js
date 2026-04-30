@@ -277,6 +277,7 @@ const UI = {
         span.dataset.index = idx;
         span.addEventListener('click', () => {
           this.vm.submitPositionTap(parseInt(idx));
+          span.blur();
         });
         container.appendChild(span);
       });
@@ -334,6 +335,7 @@ task.options.forEach((opt, idx) => {
 
       btn.addEventListener('click', () => {
         this.vm.submitAnswer(parseInt(idx));
+        btn.blur();
       });
       el.appendChild(btn);
     });
