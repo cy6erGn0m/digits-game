@@ -4,6 +4,8 @@ Task generators — creates task objects for each of the 4 task types. Each gene
 
 ## Constants
 
+> **Note:** Russian linguistic constants (`RUSSIAN_NUMBERS`, `RUSSIAN_ORDINALS`, `EMOJI_FORMS`, and gender-aware helpers) have been moved to [`russian.js`](./russian.md). They are available as globals — no import needed.
+
 ### TaskType
 
 ```javascript
@@ -12,18 +14,6 @@ TaskType.DIGIT_TO_COUNT     // 'digitToCount'
 TaskType.ADD_TO_REACH       // 'addToReach'
 TaskType.ORDINAL_POSITION   // 'ordinalPosition'
 ```
-
-### RUSSIAN_NUMBERS
-
-Number to Russian word mapping (1-20).
-
-### RUSSIAN_ORDINALS
-
-Number to Russian ordinal word mapping (1-20).
-
-### RUSSIAN_PLURALS
-
-Emoji type to Russian plural noun mapping.
 
 ### EMOJI_POOLS
 
@@ -101,7 +91,7 @@ Count → Digit. Show N emojis, user picks the correct number.
 - `id` — Unique task ID
 - `type` — TaskType.COUNT_TO_DIGIT
 - `targetNumber` — The target digit
-- `questionAudio` — Spoken question
+- `questionAudio` — Spoken question (uses `EMOJI_FORMS[emoji].gen_pl`, e.g. "Сколько самолётов?")
 - `questionEmoji` — HTML for question display
 - `items` — Array of emoji items to count
 - `options` — Array of {label, isCorrect}
@@ -124,7 +114,7 @@ Digit → Count. Show a digit, user picks the correct emoji group.
 - `id` — Unique task ID
 - `type` — TaskType.DIGIT_TO_COUNT
 - `targetNumber` — The target digit
-- `questionAudio` — Spoken question
+- `questionAudio` — Spoken question (uses `numWord` + `nounForm` for gender/case agreement, e.g. "Найди одну машинку", "Найди три мячика")
 - `questionEmoji` — Large digit HTML
 - `items` — Empty array (content shown in questionEmoji)
 - `options` — Array of {label, isCorrect} with emoji groups
@@ -148,7 +138,7 @@ Add to Reach. Show items + "?", user picks +0/+1/+2.
 - `type` — TaskType.ADD_TO_REACH
 - `targetNumber` — The target digit
 - `startCount` — Starting count
-- `questionAudio` — Spoken question
+- `questionAudio` — Spoken question (uses neuter "одно" for target=1, e.g. "Добавь, чтобы стало одно")
 - `questionEmoji` — Empty (rendered in content area instead)
 - `items` — Array of emoji items (starting count)
 - `options` — Array of {label, isCorrect, delta} (+0, +1, +2)
@@ -171,7 +161,7 @@ Ordinal Position. Show a row of emojis, user taps the Nth one. The row size is d
 - `id` — Unique task ID
 - `type` — TaskType.ORDINAL_POSITION
 - `targetNumber` — The ordinal number
-- `questionAudio` — Spoken question
+- `questionAudio` — Spoken question (uses `ordinalWord` for gender agreement, e.g. "Нажми на первую" for 🚀)
 - `questionEmoji` — HTML showing position + emoji
 - `questionLabel` — Position label (e.g., "1-й")
 - `items` — Array of emoji items in the row (size varies between `Math.max(10, target)` and `Math.min(20, max + 3)`)

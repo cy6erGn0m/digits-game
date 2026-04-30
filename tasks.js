@@ -15,34 +15,6 @@ const TaskType = {
   ORDINAL_POSITION:  'ordinalPosition',
 };
 
-const RUSSIAN_NUMBERS = {
-  1: 'один', 2: 'два', 3: 'три', 4: 'четыре', 5: 'пять',
-  6: 'шесть', 7: 'семь', 8: 'восемь', 9: 'девять', 10: 'десять',
-  11: 'одиннадцать', 12: 'двенадцать', 13: 'тринадцать',
-  14: 'четырнадцать', 15: 'пятнадцать', 16: 'шестнадцать',
-  17: 'семнадцать', 18: 'восемнадцать', 19: 'девятнадцать',
-  20: 'двадцать',
-};
-
-const RUSSIAN_ORDINALS = {
-  1: 'первый', 2: 'второй', 3: 'третий', 4: 'четвёртый', 5: 'пятый',
-  6: 'шестой', 7: 'седьмой', 8: 'восьмой', 9: 'девятый', 10: 'десятый',
-  11: 'одиннадцатый', 12: 'двенадцатый', 13: 'тринадцатый',
-  14: 'четырнадцатый', 15: 'пятнадцатый', 16: 'шестнадцатый',
-  17: 'семнадцатый', 18: 'восемнадцатый', 19: 'девятнадцатый', 20: 'двадцатый',
-};
-
-const RUSSIAN_PLURALS = {
-  animal: 'животных',
-  dog:    'собачек',
-  cat:    'кошечек',
-  apple:  'яблок',
-  fruit:  'фруктов',
-  ball:   'мячиков',
-  flower: 'цветочков',
-  car:    'машинок',
-};
-
 const EMOJI_POOLS = {
   animals: { emojis: ['🐶', '🐱', '🐰', '🦊', '🐻', '🐼'], color: 'brown', type: 'animal' },
   fruits:  { emojis: ['🍎', '🍊', '🍋', '🍇', '🍓', '🍑'], color: 'red',   type: 'apple' },
@@ -138,20 +110,18 @@ const TaskGenerators = {
     const id = this.newId();
     const pool = randomFrom(Object.values(EMOJI_POOLS));
     const emoji = randomFrom(pool.emojis);
-    const type = pool.type;
     const allSame = distractionLevel === DISTINCTION_LEVELS.NONE;
-    const pluralLabel = RUSSIAN_PLURALS[type] || RUSSIAN_PLURALS.animal;
 
     let items;
     if (allSame) {
-      items = Array(target).fill({ emoji, color: pool.color, type });
+      items = Array(target).fill({ emoji, color: pool.color, type: pool.type });
     } else {
       const pool2 = randomFrom(Object.values(EMOJI_POOLS));
       const emoji2 = randomFrom(pool2.emojis);
       const sameCount = Math.floor(target * 0.6);
       const otherCount = target - sameCount;
       items = [
-        ...Array(sameCount).fill({ emoji, color: pool.color, type }),
+        ...Array(sameCount).fill({ emoji, color: pool.color, type: pool.type }),
         ...Array(otherCount).fill({ emoji: emoji2, color: pool2.color, type: pool2.type }),
       ];
       shuffle(items);
@@ -169,7 +139,7 @@ const TaskGenerators = {
       isCorrect: n === target,
     }));
 
-    const question = `Сколько ${pluralLabel}?`;
+    const question = `Сколько ${EMOJI_FORMS[emoji].gen_pl}?`;
     const questionEmoji = '';
 
     return {
@@ -209,13 +179,13 @@ const TaskGenerators = {
     }
 
     const shuffled = shuffle(quantities);
-    const pluralLabel = (RUSSIAN_PLURALS[pool.type] || 'фруктов');
+    const forms = EMOJI_FORMS[emoji];
     const options = shuffled.map(q => ({
       label: `<span class="emoji-grid">${emoji.repeat(q)}</span>`,
       isCorrect: q === target,
     }));
 
-    const question = `Найди ${RUSSIAN_NUMBERS[target]} ${pluralLabel}`;
+    const question = `Найди ${numWord(target, forms.gender)} ${nounForm(target, forms)}`;
 
     return {
       id, type: TaskType.DIGIT_TO_COUNT,
@@ -257,7 +227,7 @@ const TaskGenerators = {
       { label: '+2', isCorrect: correctAdd === 2, delta: 2 },
     ]);
 
-    const question = `Добавь, чтобы стало ${RUSSIAN_NUMBERS[target]}`;
+    const question = `Добавь, чтобы стало ${target === 1 ? 'одно' : RUSSIAN_NUMBERS[target]}`;
 
     return {
       id, type: TaskType.ADD_TO_REACH,
@@ -289,8 +259,7 @@ const TaskGenerators = {
     const items = Array(rowSize).fill({ emoji, color: pool.color, type: pool.type });
     const correctIndex = target - 1;
     const correctIndexBackward = rowSize - target;
-    const ordinal = RUSSIAN_ORDINALS[target] || `№${target}`;
-    const question = `Нажми на ${ordinal}`;
+    const question = `Нажми на ${ordinalWord(target, EMOJI_FORMS[emoji].gender)}`;
 
 // Show which position: just the number (e.g., "1-й", "2-й")
     const questionEmoji = `
@@ -299,7 +268,7 @@ const TaskGenerators = {
       </span>
     `;
 
-    const ordinalWord = RUSSIAN_ORDINALS[target] || `${target}-й`;
+    const ordinalLabel = RUSSIAN_ORDINALS[target];
 
     return {
       id, type: TaskType.ORDINAL_POSITION,
@@ -307,7 +276,7 @@ const TaskGenerators = {
       questionAudio: question,
       questionEmoji,
       questionLabel: `${target}-й`,
-      instruction: `Нажми на ${ordinalWord}`,
+      instruction: `Нажми на ${ordinalLabel}`,
       items,
       options: [],
       correctIndex,
