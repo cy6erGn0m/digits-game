@@ -267,6 +267,8 @@ button {
     font-size: 2.5rem;
     font-weight: 700;
     color: #2d3a8c;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .task-instruction {
@@ -275,6 +277,8 @@ button {
     text-align: center;
     margin: 8px 0;
     min-height: 1.5em;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .btn-speak {
@@ -282,6 +286,8 @@ button {
     padding: 8px;
     border-radius: 50%;
     transition: transform 0.1s;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .btn-speak:active {
@@ -382,6 +388,8 @@ button {
     justify-content: center;
     padding: 8px;
     transition: transform 0.15s, border-color 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .emoji-grid {
